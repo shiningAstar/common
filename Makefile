@@ -1,0 +1,65 @@
+
+
+dir_obj_release = obj\release\src
+dir_bin_release = bin\release
+dir_obj_debug = obj\debug\src
+dir_bin_debug = bin\debug
+
+vpath %.cpp src\
+
+none_objects = main.o File.o logBase.o logTerminal.o logFile.o ControlwithLog.o \
+					logControl.o log.o MySocket.o MutexLock.o ConfigBase.o FileConfig.o \
+					SemaphorePV.o Thread.o SharedMemory.o
+
+objects_release = $(foreach file, $(none_objects), $(patsubst %.o, %_release.o, $(file)))
+objects_debug = $(foreach file, $(none_objects), $(patsubst %.o, %_debug.o, $(file)))
+
+obj_files_release = $(foreach file, $(objects_release),$(dir_obj_release)\$(file))
+obj_files_debug = $(foreach file, $(objects_debug),$(dir_obj_debug)\$(file))
+
+h_export = logBase.h logFile.h logTerminal.h File.h ControlwithLog.h logControl.h log.h MySocket.h MutexLock.h \
+			ConfigBase.h FileConfig.h SemaphorePV.h Thread.h Error.h SharedMemory.h
+
+h_export_file = $(foreach file, $(h_export), include\$(file))
+
+compile_obj_release = mingw32-g++ -Wall -O2 -Iinclude -c
+compile_obj_debug = mingw32-g++ -Wall -g -Iinclude -c
+
+target_lib_name_release = $(dir_bin_release)\libcommon.dll
+target_lib_impname_release = $(dir_bin_release)\libcommon.a
+target_lib_defname_release = $(dir_bin_release)\libcommon.def
+target_lib_name_debug = $(dir_bin_debug)\libcommon.dll
+target_lib_impname_debug = $(dir_bin_debug)\libcommon.a
+target_lib_defname_debug = $(dir_bin_debug)\libcommon.def
+
+compile_lib = mingw32-g++ -shared
+flags_release = -Wl,--output-def=$(target_lib_defname_release) \
+   -Wl,--out-implib=$(target_lib_impname_release)
+flags_debug = -Wl,--output-def=$(target_lib_defname_debug) \
+   -Wl,--out-implib=$(target_lib_impname_debug) -Wl,--dll
+
+Release : $(objects_release)
+	$(compile_lib) $(flags_release) $(obj_files_release) -o $(target_lib_name_release) -s -lws2_32 -lwsock32 -lpthread
+	if not exist ..\create\include md ..\create\include
+	for %%i in ($(h_export_file)) do copy %%i ..\create\include
+	if not exist ..\create\bin\release md ..\create\bin\release
+	copy bin\release\*.* ..\create\bin\release
+
+Debug : $(objects_debug)
+	$(compile_lib) $(flags_debug) $(obj_files_debug) -o $(target_lib_name_debug) -lws2_32 -lwsock32 -lpthread
+	if not exist ..\create\include md ..\create\include
+	for %%i in ($(h_export_file)) do copy %%i ..\create\include
+	if not exist ..\create\bin\debug md ..\create\bin\debug
+	copy bin\debug\*.* ..\create\bin\debug
+
+$(objects_release):%_release.o:%.cpp
+	$(compile_obj_release) $(<) -o $(dir_obj_release)\$@
+
+$(objects_debug):%_debug.o:%.cpp
+	$(compile_obj_debug) $< -o $(dir_obj_debug)\$@
+
+cleanRelease :
+	del $(target_lib_name_release) $(target_lib_impname_release) $(target_lib_defname_release) $(obj_files_release)
+
+cleanDebug :
+	del $(target_lib_name_debug) $(target_lib_impname_debug) $(target_lib_defname_debug) $(obj_files_debug)
