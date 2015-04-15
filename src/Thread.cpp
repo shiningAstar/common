@@ -48,13 +48,13 @@ void *Thread::threadProc(void *arg)
         return NULL;
     }
     thread = (Thread*)arg;
-    status = RUNNING;
+    thread->status = RUNNING;
     ret = (void*)thread->doWork();
-    status = STOPPING;
+    thread->status = STOPPING;
     return ret;
 }
 
-STATUS Thread::getStatus()
+THREAD_STATUS Thread::getStatus()
 {
     return status;
 }
