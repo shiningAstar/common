@@ -26,3 +26,9 @@ v 0.1.0
 6. 互斥锁 组件
    互斥锁基类 MutexLockBase
    进程内互斥锁 MutexLockInProcess
+   
+7. 共享内存 组件
+   共享内存类 SharedMemory
+   
+8. 网络通信 组件
+   网络通信Socket类 MySocket
