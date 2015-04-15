@@ -15,6 +15,7 @@ class Thread
         Thread();
         /** Default destructor */
         virtual ~Thread();
+        enum {STOPPING, RUNNING}THREAD_STATUS;
         //#ifdef _WIN32
         //static DWORD WINAPI threadProc(DWORD arg);
         //#else
@@ -22,9 +23,12 @@ class Thread
         //#endif // _WIN32
         virtual unsigned long doWork() = 0;
         bool start(pthread_attr_t *attr = NULL);
+        THREAD_STATUS getStatus();
+        bool waittoStop(void **ret);
     protected:
         pthread_t tid;
         pthread_attr_t attr;
+        THREAD_STATUS status;
     private:
 };
 

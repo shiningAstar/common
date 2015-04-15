@@ -4,7 +4,7 @@
     #include "windows.h"
 #endif // _WIN32
 
-Thread::Thread() : attr(NULL)
+Thread::Thread() : attr(NULL), status(STOPPING)
 {
     //ctor
 }
@@ -27,15 +27,36 @@ bool Thread::start(pthread_attr_t *attr)
     return true;
 }
 
+bool Thread::waittoStop(void **ret)
+{
+    if(status == STOPPING)
+        return true;
+    if(!pthread_join(tid, ret))
+    {
+        return false;
+    }
+    return true;
+}
+
 void *Thread::threadProc(void *arg)
 {
     Thread *thread;
+    void *ret;
+    pthread_detach(pthread_self());
     if(arg == NULL)
     {
         return NULL;
     }
     thread = (Thread*)arg;
-    return (void*)thread->doWork();
+    status = RUNNING;
+    ret = (void*)thread->doWork();
+    status = STOPPING;
+    return ret;
+}
+
+STATUS Thread::getStatus()
+{
+    return status;
 }
 
 namespace CurrentThread
