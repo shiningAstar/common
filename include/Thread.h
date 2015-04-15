@@ -8,6 +8,8 @@
 //    typedef unsigned long int pid_t;
 //#endif
 
+typedef enum {STOPPING, RUNNING}THREAD_STATUS;
+
 class Thread
 {
     public:
@@ -15,7 +17,7 @@ class Thread
         Thread();
         /** Default destructor */
         virtual ~Thread();
-        enum {STOPPING, RUNNING}THREAD_STATUS;
+
         //#ifdef _WIN32
         //static DWORD WINAPI threadProc(DWORD arg);
         //#else

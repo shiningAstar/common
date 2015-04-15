@@ -24,11 +24,13 @@ class ConfigBase
         bool getConf(const char *key, char *cont, int length);
         bool setConf(const char *key, const char *cont, int length);
 
+        bool getConf(const int index, char *key, int key_length, char *value, int value_length);
+
         int numOfConf();
 
 
     protected:
-        map<string, string> _configs;
+        map<string, string> *_configs;
     private:
 
 };

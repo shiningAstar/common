@@ -82,6 +82,10 @@ bool FileConfig::loadAll()
     char buf[256], key[256], value[256];
     int ret;
     File f;
+    if(_configs == NULL)
+    {
+        return false;
+    }
     if(!f.open_append(NULL, file))
     {
         return false;
@@ -163,7 +167,7 @@ bool FileConfig::loadAll()
         }
         value[i_value] = 0;
         trim(value, i_value);
-        _configs.insert(pair<string,string>(key, value));
+        _configs->insert(pair<string,string>(key, value));
 ill_line:
         ;
     }
@@ -178,6 +182,10 @@ bool FileConfig::saveAll()
 {
     File f;
     map<string, string>::iterator iter;
+    if(_configs == NULL)
+    {
+        return false;
+    }
     if(!f.open_append(NULL, file))
     {
         return false;
@@ -190,7 +198,7 @@ bool FileConfig::saveAll()
     {
         return false;
     }
-    for(iter = _configs.begin(); iter != _configs.end(); iter++)
+    for(iter = _configs->begin(); iter != _configs->end(); iter++)
     {
         f.writenBytes(iter->first.c_str(), iter->first.size());
         f.writenBytes("=", 1);
