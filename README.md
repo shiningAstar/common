@@ -7,7 +7,6 @@ v 0.1.0
    基于终端控制台输出的日志类 logTerminal
    向文件输出日志类 logFile
    向控件自定义输出的日志类 logControl
-   
    日志功能引用组件头文件 log.h
    
 2. 配置管理 组件
