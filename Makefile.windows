@@ -38,19 +38,31 @@ flags_release = -Wl,--output-def=$(target_lib_defname_release) \
 flags_debug = -Wl,--output-def=$(target_lib_defname_debug) \
    -Wl,--out-implib=$(target_lib_impname_debug) -Wl,--dll
 
-Release : $(objects_release)
+ReleaseCompile : ReleaseDir $(objects_release)
 	$(compile_lib) $(flags_release) $(obj_files_release) -o $(target_lib_name_release) -s -lws2_32 -lwsock32 -lpthread
+
+Release : ReleaseCompile
 	if not exist ..\create\include md ..\create\include
 	for %%i in ($(h_export_file)) do copy %%i ..\create\include
 	if not exist ..\create\bin\release md ..\create\bin\release
 	copy bin\release\*.* ..\create\bin\release
 
-Debug : $(objects_debug)
+DebugCompile : DebugDir $(objects_debug)
 	$(compile_lib) $(flags_debug) $(obj_files_debug) -o $(target_lib_name_debug) -lws2_32 -lwsock32 -lpthread
+
+Debug : DebugCompile
 	if not exist ..\create\include md ..\create\include
 	for %%i in ($(h_export_file)) do copy %%i ..\create\include
 	if not exist ..\create\bin\debug md ..\create\bin\debug
 	copy bin\debug\*.* ..\create\bin\debug
+
+ReleaseDir :
+	if not exist $(dir_obj_release) md $(dir_obj_release)
+	if not exist $(dir_bin_release) md $(dir_bin_release)
+
+DebugDir :
+	if not exist $(dir_obj_debug) md $(dir_obj_debug)
+	if not exist $(dir_bin_debug) md $(dir_bin_debug)
 
 $(objects_release):%_release.o:%.cpp
 	$(compile_obj_release) $(<) -o $(dir_obj_release)\$@
