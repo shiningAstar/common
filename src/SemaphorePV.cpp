@@ -17,7 +17,11 @@ SemaphoreBase::~SemaphoreBase()
 SemaphoreInProcessPV::SemaphoreInProcessPV()
 {
     //ctor
+#ifdef _WIN32
     sem = NULL;
+#else
+    memset(&sem, 0, sizeof(sem_t));
+#endif
 }
 
 SemaphoreInProcessPV::SemaphoreInProcessPV(int value)
@@ -31,8 +35,13 @@ SemaphoreInProcessPV::~SemaphoreInProcessPV()
     //dtor
     sem_destroy(&sem);
 }
-
+#ifdef _WIN32
 #define SEM_FAILED NULL
+#else
+#ifndef SEM_VALUE_MAX
+#define SEM_VALUE_MAX 32767
+#endif // SEM_VALUE_MAX
+#endif // _WIN32
 
 bool SemaphoreInProcessPV::init(int value)
 {
@@ -43,7 +52,11 @@ bool SemaphoreInProcessPV::init(int value)
     }
     if(sem_init(&sem, 1, value) < 0)
     {
+#ifdef _WIN32
         sem = NULL;
+#else
+        memset(&sem, 0, sizeof(sem_t));
+#endif
         return false;
     }
     return true;
@@ -51,10 +64,19 @@ bool SemaphoreInProcessPV::init(int value)
 
 bool SemaphoreInProcessPV::P()
 {
+#ifdef _WIN32
     if(sem == NULL)
     {
         return false;
     }
+#else
+    sem_t s;
+    memset(&s, 0, sizeof(sem_t));
+    if(memcmp(&sem, &s, sizeof(sem_t)) == 0)
+    {
+        return false;
+    }
+#endif
     if(sem_wait(&sem) < 0)
     {
         return false;
@@ -71,10 +93,19 @@ bool SemaphoreInProcessPV::P(long wait_sec, long wait_nsec)
     time.tv_sec = wait_sec;
     time.tv_nsec = wait_nsec;
 
+#ifdef _WIN32
     if(sem == NULL)
     {
         return false;
     }
+#else
+    sem_t s;
+    memset(&s, 0, sizeof(sem_t));
+    if(memcmp(&sem, &s, sizeof(sem_t)) == 0)
+    {
+        return false;
+    }
+#endif
     if(sem_timedwait(&sem, &time) < 0)
     {
         return false;
@@ -85,10 +116,19 @@ bool SemaphoreInProcessPV::P(long wait_sec, long wait_nsec)
 bool SemaphoreInProcessPV::tryP()
 {
 
+#ifdef _WIN32
     if(sem == NULL)
     {
         return false;
     }
+#else
+    sem_t s;
+    memset(&s, 0, sizeof(sem_t));
+    if(memcmp(&sem, &s, sizeof(sem_t)) == 0)
+    {
+        return false;
+    }
+#endif
     if(sem_trywait(&sem) < 0)
     {
         return false;
@@ -100,10 +140,19 @@ bool SemaphoreInProcessPV::tryP()
 bool SemaphoreInProcessPV::V()
 {
 
+#ifdef _WIN32
     if(sem == NULL)
     {
         return false;
     }
+#else
+    sem_t s;
+    memset(&s, 0, sizeof(sem_t));
+    if(memcmp(&sem, &s, sizeof(sem_t)) == 0)
+    {
+        return false;
+    }
+#endif
     if(sem_post(&sem) < 0)
     {
         return false;
@@ -112,6 +161,8 @@ bool SemaphoreInProcessPV::V()
 
 }
 
+#ifdef _WIN32
+
 bool SemaphoreInProcessPV::V(int res_count)
 {
     if(res_count <= 0 || res_count > SEM_VALUE_MAX)
@@ -119,10 +170,19 @@ bool SemaphoreInProcessPV::V(int res_count)
         return false;
     }
 
+#ifdef _WIN32
     if(sem == NULL)
     {
         return false;
     }
+#else
+    sem_t s;
+    memset(&s, 0, sizeof(sem_t));
+    if(memcmp(&sem, &s, sizeof(sem_t)) == 0)
+    {
+        return false;
+    }
+#endif
     if(sem_post_multiple(&sem, res_count) < 0)
     {
         return false;
@@ -130,14 +190,25 @@ bool SemaphoreInProcessPV::V(int res_count)
     return true;
 }
 
+#endif
+
 int SemaphoreInProcessPV::getValue()
 {
     int value;
 
+#ifdef _WIN32
     if(sem == NULL)
     {
-        return -1;
+        return false;
     }
+#else
+    sem_t s;
+    memset(&s, 0, sizeof(sem_t));
+    if(memcmp(&sem, &s, sizeof(sem_t)) == 0)
+    {
+        return false;
+    }
+#endif
     if(sem_getvalue(&sem, &value) < 0)
     {
         return -1;
@@ -147,9 +218,13 @@ int SemaphoreInProcessPV::getValue()
 }
 bool SemaphoreInProcessPV::available()
 {
-
+#ifdef _WIN32
     return sem != NULL;
-
+#else
+    sem_t s;
+    memset(&s, 0, sizeof(sem_t));
+    return memcmp(&sem, &s, sizeof(sem_t)) != 0;
+#endif
 }
 
 int SemaphoreInProcessPV::getErrno()
@@ -177,8 +252,6 @@ SemaphoreOutProcessPV::~SemaphoreOutProcessPV()
     sem_unlink(name);
 
 }
-
-#define SEM_FAILED NULL
 
 bool SemaphoreOutProcessPV::init(char *name, int open_flag, int value)
 {
@@ -259,6 +332,8 @@ bool SemaphoreOutProcessPV::V()
     return true;
 }
 
+#ifdef _WIN32
+
 bool SemaphoreOutProcessPV::V(int res_count)
 {
     if(res_count <= 0 || res_count > SEM_VALUE_MAX)
@@ -275,6 +350,8 @@ bool SemaphoreOutProcessPV::V(int res_count)
     }
     return true;
 }
+
+#endif
 
 int SemaphoreOutProcessPV::getValue()
 {

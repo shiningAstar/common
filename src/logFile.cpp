@@ -1,5 +1,6 @@
 #include "logFile.h"
 #include "stdio.h"
+#include "string.h"
 
 logFile::logFile()
 {

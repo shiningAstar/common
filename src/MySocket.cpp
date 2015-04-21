@@ -83,14 +83,14 @@ MySocket* MySocket::NewSockInst()
 {
     return new MySocket;
 }
-
+#ifdef _WIN32
 int MySocket::GetSockAddrFromChar(sockaddr *addr, char *ip, int port)
 {
 	struct hostent *phe;
 	//struct servent* pse;
 	struct sockaddr_in sin;
-	//char  phebuf[1024];
-	//int   herr;
+	char  phebuf[1024];
+	int   herr;
 
 	memset(&sin,0,sizeof(sin));
 	sin.sin_family = AF_INET;
@@ -109,6 +109,7 @@ int MySocket::GetSockAddrFromChar(sockaddr *addr, char *ip, int port)
 	memcpy(addr,&sin,sizeof(sin));
 	return OK;
 }
+#endif
 
 MySocket::MySocket()
 {

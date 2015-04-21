@@ -1,6 +1,7 @@
 #include "MutexLock.h"
 #include "log.h"
 #include "stdio.h"
+#include "string.h"
 
 //#define use_log //use or comment this to use/unuse the log component in this library
 MutexLockBase::MutexLockBase()
@@ -16,10 +17,18 @@ MutexLockBase::~MutexLockBase()
 MutexLockInProcess::MutexLockInProcess() : _holder(0)
 {
     //ctor
+#ifdef _WIN32
     _mutex = NULL;
+#else
+    memset(&_mutex, 0, sizeof(_mutex));
+#endif
     if(pthread_mutex_init(&_mutex, NULL) < 0)
     {
-        _mutex = NULL;
+#ifdef _WIN32
+    _mutex = NULL;
+#else
+    memset(&_mutex, 0, sizeof(_mutex));
+#endif
         //err = errno;
     }
 }
@@ -92,11 +101,12 @@ bool MutexLockOutProcess::init(char *name, int open_flag)
 void MutexLockOutProcess::lock()
 {
     sem.P();
-#ifndef _WIN32
-    _holder = gettid();
-#else
-    _holder = (unsigned long)GetCurrentThread();
-#endif
+//#ifndef _WIN32
+    _holder = CurrentThread::tid();
+/* #else
+ *     _holder = (unsigned long)GetCurrentThread();
+ * #endif
+ */
 }
 
 void MutexLockOutProcess::unlock()

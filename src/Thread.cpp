@@ -1,10 +1,18 @@
 #include "Thread.h"
+#include "string.h"
+
+
 
 #ifdef _WIN32
     #include "windows.h"
+#else
+//    #define _GNU_SOURCE
+    #include "unistd.h"
+    #include "sys/syscall.h"
+    #include "sys/types.h"
 #endif // _WIN32
 
-Thread::Thread() : attr(NULL), status(STOPPING)
+Thread::Thread() :  status(STOPPING)
 {
     //ctor
 }

@@ -11,7 +11,9 @@
 
 extern "C"
 {
+#ifdef _WIN32
     #include "windows.h"
+#endif
     // A function adding two integers and returning the result
     int SampleAddInt(int i1, int i2)
     {

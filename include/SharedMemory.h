@@ -5,6 +5,8 @@
 #include "windows.h"
 #endif // _WIN32
 
+#include "stdlib.h"
+
 class SharedMemory
 {
     public:

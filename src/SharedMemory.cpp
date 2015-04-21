@@ -14,6 +14,14 @@ void sm_use_global_name(int is_use)
 		sharememory_use_global_name = 0;
 }
 
+#else
+
+#include "sys/mman.h"
+#include "fcntl.h"
+#include "errno.h"
+#include "sys/stat.h"
+#include "unistd.h"
+
 #endif
 
 SharedMemory::SharedMemory() : size(0), mem_ptr(NULL)
@@ -43,7 +51,7 @@ SharedMemory::~SharedMemory()
 
     if (shm_unlink(name) < 0)
     {
-        printf("shm_unlink %s\n",filename);
+        printf("shm_unlink %s\n",name);
         //printf("shm_unlink ");
     }
 
@@ -142,12 +150,13 @@ bool SharedMemory::init(char *name, size_t size)
 #else
 
     int fd;
+    struct stat shm_stat;
     fd = shm_open(this->name, O_RDWR | O_CREAT | O_EXCL, 666);
     if( fd < 0 && errno == EEXIST)
     {
     	//printf("mm_init shm_open EEXIST\n");
     	create = false;
-        fd = shm_open(filename, O_RDWR | O_EXCL, 666);
+        fd = shm_open(this->name, O_RDWR | O_EXCL, 666);
         if (fd < 0)
         {
             printf("mm_init shm_open(%s) failed. errno=%d \n", this->name, errno);
@@ -181,7 +190,7 @@ filemap:
 
     close(fd);
 
-    if(mem_ptr = MAP_FAILED)
+    if(mem_ptr == MAP_FAILED)
     {
         close(fd);
         return false;
