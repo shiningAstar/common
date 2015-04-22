@@ -20,6 +20,28 @@ v 0.1.1.4
 10. 修改Makefile适应linux编译
 11. 修改main.cpp，使windows.h根据平台条件include
 
+
+v 0.1.1.3
+
+1. windows下Makefile改名，加上.windows后缀，以适应linux/windows编译
+
+
+v 0.1.1.2
+
+1. 修改配置Config类，解决stl map在dll之间传递可能的不匹配问题
+2. 加入配置Config类，根据索引查找数据的接口，用于查找与遍历
+
+
+v 0.1.1.1
+
+修正不能编译的问题
+
+
+v 0.1.1
+
+1. 加入线程状态与线程等待结束函数
+
+
 v 0.1.0
 
 1. 日志 异常处理 组件
