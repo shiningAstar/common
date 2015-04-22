@@ -37,6 +37,10 @@ compile_lib = g++ -shared
 flags_release =
 flags_debug =
 
+all : Debug Release
+
+clean : cleanDebug cleanRelease
+
 ReleaseCompile : ReleaseDir $(objects_release)
 	$(compile_lib) $(flags_release) $(obj_files_release) -o $(target_lib_name_release) -s   -lpthread
 
