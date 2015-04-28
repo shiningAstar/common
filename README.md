@@ -1,5 +1,14 @@
 # common 基础功能组件
 
+v 0.1.1.5
+
+做了windows版本的下列调整
+1. 修改Thread类，加入等待结束函数
+2. 加入crc校验16位，32位函数
+3. 加入字符-指针映射类 FuncPtrMap
+4. 加入打断阻塞类 BlockingInterruptor
+
+
 v 0.1.1.4
 
 主要工作：适应linux下编译的跨平台的差异性

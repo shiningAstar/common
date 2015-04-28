@@ -37,12 +37,18 @@ bool Thread::start(pthread_attr_t *attr)
 
 bool Thread::waittoStop(void **ret)
 {
-    if(status == STOPPING)
-        return true;
-    if(!pthread_join(tid, ret))
+    void *pr;
+    //if(status == STOPPING)
+        //return true;
+    if(!pthread_join(tid, &pr))
     {
         return false;
     }
+    if(ret == NULL)
+    {
+        return true;
+    }
+    *ret = pr;
     return true;
 }
 

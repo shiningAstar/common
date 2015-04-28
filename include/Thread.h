@@ -26,7 +26,7 @@ class Thread
         virtual unsigned long doWork() = 0;
         bool start(pthread_attr_t *attr = NULL);
         THREAD_STATUS getStatus();
-        bool waittoStop(void **ret);
+        bool waittoStop(void **ret=NULL);
     protected:
         pthread_t tid;
         pthread_attr_t attr;
