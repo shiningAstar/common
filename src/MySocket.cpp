@@ -12,6 +12,8 @@
 
 #include "../include/MySocket.h"
 
+#include "BlockingInterruptor.h"
+
 #ifdef _WIN32
 	#pragma comment(lib, "Ws2_32.lib")
 	#pragma comment(lib, "mswsock.lib")
@@ -403,6 +405,60 @@ int MySocket::SelectWait(long SEvent,long MSec)
 	}
 	int sn=Select(pfdr,pfdw, NULL,MSec);
 	if (sn > 0){
+		if(SEvent==FD_READWRITE){
+			if(FD_ISSET(m_socket, pfdr) && FD_ISSET(m_socket,pfdw)) {
+				return (sn = FD_READWRITE);
+			}
+			else if(FD_ISSET(m_socket, pfdr)){
+				return (sn = FD_READ);
+			}
+			else if(FD_ISSET(m_socket, pfdw)){
+				return (sn = FD_WRITE);
+			}
+		}
+		else if(SEvent==FD_READ){
+			if(FD_ISSET(m_socket, pfdr)){
+				return (sn = FD_READ);
+			}
+		}
+		else if(SEvent==FD_WRITE){
+			if(FD_ISSET(m_socket, pfdw)){
+				return (sn = FD_WRITE);
+			}
+		}
+		sn = FD_NONE;
+	}
+	return sn;
+}
+
+int MySocket::SelectWaitInterruptable(BlockingInterruptor *interruptor, long SEvent, long MSec)
+{
+    fd_set fdr,fdw,*pfdr=NULL,*pfdw=NULL;
+    if(interruptor == NULL || !interruptor->available())
+    {
+        return SelectWait(SEvent, MSec);
+    }
+    if(SEvent & FD_READ){
+		FD_ZERO(&fdr);
+		pfdr = &fdr;
+		FD_SET(m_socket, &fdr);
+		FD_SET(interruptor->getSockOut()->GetSocket(), &fdr);
+	}
+	if(SEvent & FD_WRITE){
+		FD_ZERO(&fdw);
+		pfdw = &fdw;
+		FD_SET(m_socket, &fdw);
+	}
+	int sn=Select(pfdr,pfdw, NULL,MSec);
+	if (sn > 0){
+        if(FD_ISSET(interruptor->getSockOut()->GetSocket(), pfdr))
+        {
+            if(!interruptor->restore())
+            {
+                return FD_NONE;
+            }
+            return FD_INTERRUPT;
+        }
 		if(SEvent==FD_READWRITE){
 			if(FD_ISSET(m_socket, pfdr) && FD_ISSET(m_socket,pfdw)) {
 				return (sn = FD_READWRITE);

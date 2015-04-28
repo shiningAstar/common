@@ -68,6 +68,7 @@ public:
 #define  FD_WRITE 	   0x02
 #define  FD_READWRITE  0x03
 #define  FD_DISCONNECT       0x04
+#define  FD_INTERRUPT  0x08
 
 #ifdef _WIN32
 	typedef int socklen_t;
@@ -122,7 +123,7 @@ typedef enum
 	IGNORE=-3
 } ReturnValue;
 
-
+class BlockingInterruptor;
 
 class LIB_EXPORT MySocket
 {
@@ -173,6 +174,7 @@ public:
 	int CreateMulticast(char* Address,int Port,int BufSize=-1);
 	int Select(fd_set *readfds, fd_set *writefds=NULL,fd_set *exceptfds=NULL,long msec=0);
 	int SelectWait(long SEvent=FD_READ,long MSec=0);
+	int SelectWaitInterruptable(BlockingInterruptor *interruptor=NULL, long SEvent=FD_READ, long MSec=0);
 
 	int Poll(int SEvent = FD_READ | FD_WRITE, int MSec = 0);
 	int SetNonBlockMode(DWORD bBlock=1);
@@ -207,7 +209,7 @@ public:
 	void Close();
 	void CloseMulticast();
 
-    int GetLastSocketError ();
+    int GetLastSocketError();
     int ObtainLocalAddr();
 	int GetNetAddr(sockaddr *sa,char *addr,int *port);
 	int GetLocalAddr(char *addr,int *port);
