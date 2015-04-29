@@ -7,6 +7,8 @@ v 0.1.1.5
 2. 加入crc校验16位，32位函数
 3. 加入字符-指针映射类 FuncPtrMap
 4. 加入打断阻塞类 BlockingInterruptor
+5. 修改FileConfig，修正读取EOF后的行为
+6. 修改ConfigBase，修正根据index查询时返回值指针问题引起的段错误
 
 
 v 0.1.1.4
