@@ -1,5 +1,9 @@
 #include "FileConfig.h"
 
+#include "stdio.h"
+
+#define BUF_SIZE 256
+
 FileConfig::FileConfig(char *file)
 {
     //ctor
@@ -63,7 +67,6 @@ int loadLine(File *file, char *buffer, int buf_len)
             }
             if(c != '\n')
             {
-                pos = -1;
                 break;
             }
             break;
@@ -73,13 +76,13 @@ int loadLine(File *file, char *buffer, int buf_len)
     if(pos < 0)
         return -1;
     buffer[pos] = 0;
-    return pos + 1;
+    return pos;
 }
 
 //从源处载入配置
 bool FileConfig::loadAll()
 {
-    char buf[256], key[256], value[256];
+    char buf[BUF_SIZE], key[BUF_SIZE], value[BUF_SIZE];
     int ret;
     File f;
     if(_configs == NULL)
@@ -94,7 +97,7 @@ bool FileConfig::loadAll()
     {
         return false;
     }
-    while((ret = loadLine(&f, buf, 256)) > 0)
+    while((ret = loadLine(&f, buf, BUF_SIZE)) > 0)
     {
         int i_key = 0, i_value = 0, c = 0;// c 五状态 0开始 1key内容 2中间 3value内容 4结束
         //bool ill = false;
@@ -119,6 +122,7 @@ bool FileConfig::loadAll()
                 }
                 c = 1;
                 key[i_key] = ch;
+                i_key++;
                 break;
                 case 1 : //key内容
                 if(ill(ch))
@@ -135,6 +139,7 @@ bool FileConfig::loadAll()
                     {
                         key[i_key] = 0;
                         c = 2;
+                        continue;
                     }
                     goto ill_line;
                 }
@@ -151,6 +156,8 @@ bool FileConfig::loadAll()
                     goto ill_line;
                 }
                 c = 3;
+                value[i_value] = ch;
+                i_value++;
                 break;
                 case 3: //value内容
                 if(unprintable(ch))
@@ -167,6 +174,7 @@ bool FileConfig::loadAll()
         }
         value[i_value] = 0;
         trim(value, i_value);
+        printf("key : %s, value : %s\n", key, value);
         _configs->insert(pair<string,string>(key, value));
 ill_line:
         ;

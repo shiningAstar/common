@@ -59,7 +59,6 @@ bool ConfigBase::setConf(const char *key, int key_buflen, const char *cont, int 
 bool ConfigBase::getConf(const int index, char *key, int key_buflen, char *value, int value_buflen)
 {
     int size, length;
-    map<string, string>::iterator iter;
     if(_configs == NULL)
     {
         return false;
@@ -95,8 +94,8 @@ bool ConfigBase::getConf(const int index, char *key, int key_buflen, char *value
     {
         return false;
     }
-    strncpy(key, iter->first.c_str(), key_buflen);
-    strncpy(value, iter->second.c_str(), value_buflen);
+    strncpy(key, cur->first.c_str(), key_buflen);
+    strncpy(value, cur->second.c_str(), value_buflen);
     return true;
 }
 
