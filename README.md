@@ -9,7 +9,8 @@ v 0.1.1.5
 4. 加入打断阻塞类 BlockingInterruptor
 5. 修改FileConfig，修正读取EOF后的行为
 6. 修改ConfigBase，修正根据index查询时返回值指针问题引起的段错误
-
+7. 加入字符-函数指针表、字符-数字id表类型，FuncPtrMap, CmdIdMap，并实现按index遍历接口
+8. 加入了泛型支持通用映射类NorMap
 
 v 0.1.1.4
 

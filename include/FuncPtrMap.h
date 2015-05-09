@@ -3,8 +3,12 @@
 
 #include "map"
 #include "string"
+#include "base.h"
+#include "string.h"
 
 using namespace std;
+
+typedef unsigned long (*CmdFunc)(void *arg);
 
 class FuncPtrMap
 {
@@ -14,11 +18,35 @@ class FuncPtrMap
         /** Default destructor */
         virtual ~FuncPtrMap();
 
-        void *getFuncPtr(char *name, int length);
-        bool setFuncPtr(char *name, int length, void *func);
+        CmdFunc getFuncPtr(char *name, int length);
+        bool setFuncPtr(char *name, int length, CmdFunc func);
+
+        CmdFunc getFuncPtr(int index, char *name, int length);
+
+        int numOfFunc();
     protected:
-        map<string, void*> *_funcMap;
+        map<string, CmdFunc> *_funcMap;
+        map<string, CmdFunc>::iterator cur;
+        int index;
     private:
+};
+
+class CmdIdMap
+{
+public:
+    CmdIdMap();
+    virtual ~CmdIdMap();
+
+    int getCmdId(char *name, int length);
+    bool setCmdId(char *name, int length, int id);
+
+    int getCmdId(int index, char *name, int length);
+
+    int numOfId();
+protected:
+    map<string, int> *_idMap;
+    map<string, int>::iterator cur;
+    int index;
 };
 
 #endif // FUNCPTRMAP_H
