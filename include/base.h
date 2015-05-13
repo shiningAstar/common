@@ -27,7 +27,7 @@ correct:
 //分割字符串str，以split_char为分隔符
 //最多max_num_str个缓冲区, 每个缓冲区最大max_len_str + 1个字节空间
 inline bool split_string(const char *str, int len, char split_char,
-                         char **split_str, int max_num_str, int max_len_str,
+                         char *split_str, int max_num_str, int max_len_str,
                          int *num_str)
 {
     int num = 0, pos = 0, i;
@@ -44,7 +44,7 @@ inline bool split_string(const char *str, int len, char split_char,
             {
                 continue;
             }
-            split_str[num][pos] = 0;
+            *(split_str + num * max_len_str + pos) = 0;
             num++;
             pos = 0;
             continue;
@@ -55,7 +55,7 @@ inline bool split_string(const char *str, int len, char split_char,
             {
                 break;
             }
-            split_str[num][pos] = 0;
+            *(split_str + num * max_len_str + pos) = 0;
             num++;
             pos = 0;
             break;
@@ -68,7 +68,7 @@ inline bool split_string(const char *str, int len, char split_char,
         {
             return false;
         }
-        split_str[num][pos] = str[i];
+        *(split_str + num * max_len_str + pos) = str[i];
         pos++;
         if(pos == max_len_str + 1)
         {
