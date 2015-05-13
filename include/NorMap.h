@@ -217,7 +217,7 @@ public:
         {
             return false;
         }
-        strncpy(key, cur->first, key_len);
+        strncpy(key, cur->first.c_str(), key_len);
         *value = cur->second;
         return true;
     }
@@ -276,7 +276,7 @@ public:
         {
             return false;
         }
-        strncpy(value, iter->second, value_len);
+        strncpy(value, iter->second.c_str(), value_len);
         return true;
     }
     bool setValue(keytype key, char *value, int value_len)
@@ -294,7 +294,7 @@ public:
             index = 0;
             return true;
         }
-        strncpy(iter->second, value, value_len);
+        iter->second = value;
         return true;
     }
     bool getValue(int index, keytype *key, char *value, int value_len)
@@ -336,7 +336,7 @@ public:
             return false;
         }
         *key = cur->first;
-        strncpy(value, cur->second, value_len);
+        strncpy(value, cur->second.c_str(), value_len);
         return true;
     }
 
@@ -378,6 +378,10 @@ public:
         delete _map;
     }
 
+    /**
+        key_len和value_len均为字符串长度，即 len = 字符个数+1 ;
+        注：string类型的length()函数为字符个数，若要用作 len 需要加1;
+    */
     bool getValue(char *key, int key_len, char *value, int value_len)
     {
         map<string, string>::iterator iter;
@@ -397,6 +401,10 @@ public:
         strncpy(value, iter->second.c_str(), value_len);
         return true;
     }
+    /**
+        key_len和value_len均为字符串长度，即 len = 字符个数+1 ;
+        注：string类型的length()函数为字符个数，若要用作 len 需要加1;
+    */
     bool setValue(char *key, int key_len, char *value, int value_len)
     {
         map<string, string>::iterator iter;
