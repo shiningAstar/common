@@ -376,7 +376,7 @@ bool verify_crc16_data(unsigned char *src, int len, const unsigned char *crc)
 		return false;
 	}
 
-	if(memcpy(crc16, crc, 2) != 0)
+	if(memcmp(crc16, crc, 2) != 0)
 	{
 		return false;
 	}
