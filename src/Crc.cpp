@@ -321,21 +321,7 @@ int make_crc16_code(const unsigned char *data,int len, unsigned char *crc16)
 //
 //	return crc32;
 //}
-int update_crc16_by_string(const unsigned char *data,int len,unsigned char *crc16 )
-{
-    if(data == NULL || len <= 0 || crc16 == NULL)
-    {
-        return -1;
-    }
-	int index; /* CRC循环中的索引 */
-    while (len--) /* 传输消息缓冲区 */
-    {
-                index = crc16[0] ^ *data++ ; /* 计算CRC */
-                crc16[0] = crc16[1] ^ crc16_1[index] ;
-                crc16[1] = crc16_2[index];
-    }
-    return 0;
-}
+
 int make_crc32_code(const unsigned char *data, int len, unsigned char *crc32)
 {
     if(data == NULL || len <= 0 || crc32 == NULL)
@@ -352,6 +338,10 @@ int make_crc32_code(const unsigned char *data, int len, unsigned char *crc32)
         crc32[2] = crc32[3] ^ crc32_3[index];
         crc32[3] = crc32_4[index];
     }
+    crc32[0] ^= 0xFF;
+    crc32[1] ^= 0xFF;
+    crc32[2] ^= 0xFF;
+    crc32[3] ^= 0xFF;
     return 0;
 }
 //int check_crc16_encode_data(char *src_with_crc, int len)
@@ -371,36 +361,7 @@ int make_crc32_code(const unsigned char *data, int len, unsigned char *crc32)
 //	return crc16 == crc_src ? 0 : -1;
 //
 //}
-int update_crc32_by_string(const unsigned char *data, int len, unsigned char *crc32)
-{
-    if(data == NULL || len <= 0 || crc32 == NULL)
-    {
-        return -1;
-    }
-    int index;
-    while(len--)
-    {
-        index = crc32[0] ^ *data++;
-        crc32[0] = crc32[1] ^ crc32_1[index];
-        crc32[1] = crc32[2] ^ crc32_2[index];
-        crc32[2] = crc32[3] ^ crc32_3[index];
-        crc32[3] = crc32_4[index];
-    }
-    return 0;
-}
-bool get_final_crc32(unsigned char *crc32)
-{
-    if(crc32 == NULL)
-    {
-        return false;
-    }
-    crc32[0] ^= 0xFF;
-    crc32[1] ^= 0xFF;
-    crc32[2] ^= 0xFF;
-    crc32[3] ^= 0xFF;
-    return true;
 
-}
 bool verify_crc16_data(unsigned char *src, int len, const unsigned char *crc)
 {
 	char crc16[2];
@@ -456,14 +417,65 @@ bool verify_crc32_data(unsigned char *src, int len, const unsigned char *crc)
 		return false;
 	}
 
-	if(!get_final_crc32((unsigned char*)crc32))
-    {
-        return false;
-    }
 	if(memcmp(crc32, crc, 4) != 0)
 	{
 		return false;
 	}
 
 	return true;
+}
+bool init_crc16(unsigned char * crc16)
+{
+    crc16[0] = crc16[1] = 0x00; /* 高CRC字节初始化 */ /* 低CRC 字节初始化 */
+    return true;
+}
+int update_crc16_by_string(const unsigned char *data,int len,unsigned char *crc16 )
+{
+    if(data == NULL || len <= 0 || crc16 == NULL)
+    {
+        return -1;
+    }
+	int index; /* CRC循环中的索引 */
+    while (len--) /* 传输消息缓冲区 */
+    {
+                index = crc16[0] ^ *data++ ; /* 计算CRC */
+                crc16[0] = crc16[1] ^ crc16_1[index] ;
+                crc16[1] = crc16_2[index];
+    }
+    return 0;
+}
+bool init_crc32(unsigned char *crc32)
+{
+    crc32[0] = crc32[1] = crc32[2] = crc32[3] = 0xFF;
+    return true;
+}
+int update_crc32_by_string(const unsigned char *data, int len, unsigned char *crc32)
+{
+    if(data == NULL || len <= 0 || crc32 == NULL)
+    {
+        return -1;
+    }
+    int index;
+    while(len--)
+    {
+        index = crc32[0] ^ *data++;
+        crc32[0] = crc32[1] ^ crc32_1[index];
+        crc32[1] = crc32[2] ^ crc32_2[index];
+        crc32[2] = crc32[3] ^ crc32_3[index];
+        crc32[3] = crc32_4[index];
+    }
+    return 0;
+}
+bool get_final_crc32(unsigned char *crc32)
+{
+    if(crc32 == NULL)
+    {
+        return false;
+    }
+    crc32[0] ^= 0xFF;
+    crc32[1] ^= 0xFF;
+    crc32[2] ^= 0xFF;
+    crc32[3] ^= 0xFF;
+    return true;
+
 }

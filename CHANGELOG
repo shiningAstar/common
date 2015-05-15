@@ -18,3 +18,4 @@ v 0.1.1.5
 14. 加入modbus的crc16算法
 15. 修改了crc16位校验中的函数使用错误，讲memcpy()改为了memcmp
 16. 修改了crc校验函数，添加了update_crc16_by_string 和update_crc32_by_string来更新Crc校验码。
+17. 修改了crc校验函数，添加了int_crc16 和inti_crc32函数来初始化crc校验码，将crc生成分为了一次性生成函数与分段生成函数，其中make与verify配合使用,init与update配合使用
