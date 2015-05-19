@@ -91,6 +91,8 @@ private:
     ListHeadT<type,offset> *prev,*next;
 };
 
+#define list_entry(list_node, entry_type, member_name) ((entry_type*)((char*)(list_node) - (char*)(&(((entry_type*)0)->member_name))))
+
 class ListHead
 {
 public:
