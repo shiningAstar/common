@@ -11,6 +11,16 @@ v 0.1.1.5
 6. 修改ConfigBase，修正根据index查询时返回值指针问题引起的段错误
 7. 加入字符-函数指针表、字符-数字id表类型，FuncPtrMap, CmdIdMap，并实现按index遍历接口
 8. 加入了泛型支持通用映射类NorMap
+9. 加入了切割字符串函数splite_string
+10. 修改split_string,解决二维指针参数传递问题，第四个参数调用时(char*)split_str或&split_str[0][0]
+11. 完成了NorMap的测试，修改了其中string 赋值给const
+	char*的类型不匹配问题。添加了一些对函数参数的注释，修改后，测试已通过
+12. 完成了split_str函数的测试，添加了对函数参数的的描述性注释，测试已通过
+13. 修改crc16位与32位的生成函数与验证函数
+14. 加入modbus的crc16算法
+15. 修改了crc16位校验中的函数使用错误，讲memcpy()改为了memcmp
+16. 修改了crc校验函数，添加了update_crc16_by_string 和update_crc32_by_string来更新Crc校验码。
+17. 修改了crc校验函数，添加了int_crc16 和inti_crc32函数来初始化crc校验码，将crc生成分为了一次性生成函数与分段生成函数，其中make与verify配合使用,init与update配合使用
 
 v 0.1.1.4
 
