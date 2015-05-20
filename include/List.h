@@ -1,6 +1,32 @@
 #ifndef LIST_H
 #define LIST_H
+/**
+    使用说明：
+    ListT:
+        * ListT为拥有头结点的双向链表，链表中的节点类型为ListHeadT
+        *假设有结构体 typedef struct data{
+                                            int int_data;
+                                            char ch_data[101];
+                                            ListHeadT<data,105> listheadt;
+                                                    }
+        有链表 ListT<data,104>，其中，此模板中的data并非其节点类型，而是用来生成其节点类型，105为listheadt的相对偏移，也即
+            该数据前的数据长度，记得内存对齐
+        * 而ListT类型中的每个节点都是data类型的变量中的成员，所以，该节点的地址也是data类型的变量中的listHeader成员的地址
+        * 所以，data类型的数据中，listheadt的相对首地址的地址偏移为104,也即listheadt的首个字节的地址减去105即得到data类型结构体的地址，
+            即可得到data类型数据，这就是getEntry的功能，获取data类型数据。
+    List:
 
+        * list数据的插入操作与ListT类似，获取数据略有不同，通过list_entry()宏来实现数据的获取
+        * list_entry(list_node, entry_type, member_name) 宏用来获取list节点的数据，下面介绍参数含义
+            假设有结构体 typedef struct data{
+                                            int int_data;
+                                            char ch_data[101];
+                                            ListHead listhead;
+                                                    }
+        * list_node：要获取数据的节点的指针
+        * entry_type： 结构体的类型，这里为data
+        * member_name，结构体中链表节点的名称，这里为listhead
+*/
 #include "stdlib.h"
 template <typename type, int offset>
 class ListHeadT;
@@ -76,6 +102,11 @@ public:
         init();
     }
 
+    /**
+        *获取type型的数据
+        *this的地址减去偏移offset即得到type类型数据的地址
+        *其中，this为type中的ListHeadT类型的成员,offset为this所在地址距离type首地址的偏移，也即this前的数据的长度
+    */
     type *getEntry()
     {
         return (type*)((char*)this - offset);
@@ -91,6 +122,17 @@ private:
     ListHeadT<type,offset> *prev,*next;
 };
 
+
+/** list_entry(list_node, entry_type, member_name) 宏用来获取list节点的数据，下面介绍参数含义
+            假设有结构体 typedef struct data{
+                                            int int_data;
+                                            char ch_data[101];
+                                            ListHead listhead;
+                                                    }
+        * list_node：要获取数据的节点的指针
+        * entry_type： 结构体的类型，这里为data
+        * member_name，结构体中链表节点的名称，这里为listhead
+*/
 #define list_entry(list_node, entry_type, member_name) ((entry_type*)((char*)(list_node) - (char*)(&(((entry_type*)0)->member_name))))
 
 class ListHead
@@ -185,6 +227,7 @@ inline void __list_add(ListHeadT<type,offset> *n, ListHeadT<type,offset> *prev, 
     n->setPrev(prev);
     next->setPrev(n);
     n->setNext(next);
+
 }
 template <typename type, int offset>
 inline void __list_del(ListHeadT<type,offset> *prev, ListHeadT<type,offset> *next)
@@ -193,14 +236,19 @@ inline void __list_del(ListHeadT<type,offset> *prev, ListHeadT<type,offset> *nex
     next->setPrev(prev);
 }
 
+/**
+    *队列为拥有头结点的双向的链表，尾节点的前向指针指向头结点
+    *初始化时，头结点前后指针都指向本身
+
+*/
 template <typename type, int offset>
 class ListT
 {
     public:
         /** Default constructor */
-        ListT();
+        ListT(){}
         /** Default destructor */
-        virtual ~ListT();
+        virtual ~ListT(){}
 
         //void init(){head.init()}
 
@@ -208,10 +256,14 @@ class ListT
 
         ListHeadT<type, offset> *getFirst()
         {ListHeadT<type, offset> *tmp = head.getNext();if(tmp == &head) return NULL;return tmp;}
+
         ListHeadT<type, offset> *getLast()
         {ListHeadT<type, offset> *tmp = head.getPrev();if(tmp == &head) return NULL;return tmp;}
 
+        /* 添加节点到头结点的下一个节点，即链表首*/
         void add(ListHeadT<type, offset> *list){head.add(list);}
+
+        /*  添加节点到头结点的前一个节点，即链表尾*/
         void addTail(ListHeadT<type, offset> *list){head.add_tail(list);}
 
         void moveFirst(ListHeadT<type, offset> *list){head.move(list);}
@@ -223,15 +275,16 @@ class ListT
 
     protected:
     private:
+        /* 链表头节点，不赋值，只用于链表操作*/
         ListHeadT<type, offset> head;
 };
 class List
 {
     public:
         /** Default constructor */
-        List();
+        List(){}
         /** Default destructor */
-        virtual ~List();
+        virtual ~List(){}
 
         ListHead *getHead(){return &head;}
 

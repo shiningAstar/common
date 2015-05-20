@@ -5,7 +5,9 @@
 #include "string"
 #include "base.h"
 #include "string.h"
-
+/**
+    注意：delvalue()函数使用时，未找到与要删除的键值对匹配的键值对是，返回true
+*/
 using namespace std;
 
 template <typename keytype, typename valuetype>
