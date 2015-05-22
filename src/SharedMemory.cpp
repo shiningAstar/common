@@ -64,6 +64,16 @@ SharedMemory::SharedMemory(char *name, size_t size)
     init(name, size);
 }
 
+void *SharedMemory::getAddr()
+{
+    return mem_ptr;
+}
+
+unsigned long SharedMemory::getSize()
+{
+    return size;
+}
+
 bool SharedMemory::init(char *name, size_t size)
 {
     if(name == NULL || size < 0)
