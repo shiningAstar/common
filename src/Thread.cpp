@@ -85,7 +85,7 @@ namespace CurrentThread
         #ifndef _WIN32
             thread_id = static_cast<pid_t>(::syscall(SYS_gettid));
         #else
-            thread_id = (pid_t)GetCurrentThread();
+            thread_id = (pid_t)GetCurrentThreadId();
         #endif // _WIN32
         return thread_id;
     }

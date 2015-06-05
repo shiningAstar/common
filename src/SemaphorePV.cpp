@@ -50,11 +50,15 @@ bool SemaphoreInProcessPV::init(int value)
     {
         return false;
     }
-    if(sem_init(&sem, 1, value) < 0)
+
+   #ifdef _WIN32
+    if(sem_init(&sem, 0, value) < 0)
     {
-#ifdef _WIN32
+
         sem = NULL;
 #else
+    if(sem_init(&sem, 1, value) < 0)
+    {
         memset(&sem, 0, sizeof(sem_t));
 #endif
         return false;
@@ -106,7 +110,8 @@ bool SemaphoreInProcessPV::P(long wait_sec, long wait_nsec)
         return false;
     }
 #endif
-    if(sem_timedwait(&sem, &time) < 0)
+int i;
+    if((i = sem_timedwait(&sem, &time) ) < 0)
     {
         return false;
     }
@@ -266,7 +271,7 @@ bool SemaphoreOutProcessPV::init(char *name, int open_flag, int value)
         case OPEN_OR_CREATE: oflag = O_CREAT; break;
         case CREATE_ONLY: oflag = O_CREAT | O_EXCL; break;
     }
-    if((psem = (sem_t*)sem_open(name, oflag, 666, value)) == SEM_FAILED)
+    if((psem = (sem_t*)sem_open(name, oflag, 666, value)) == SEM_FAILED || psem == (sem_t*)0xfffffffff )
     {
         psem = NULL;
         return false;
@@ -300,7 +305,7 @@ bool SemaphoreOutProcessPV::P(long wait_sec, long wait_nsec)
     {
         return false;
     }
-    if(sem_timedwait(psem, &time) < 0)
+    if((sem_timedwait(psem, &time)) < 0)
     {
         return false;
     }

@@ -67,16 +67,22 @@ class MutexLockOutProcess : MutexLockBase
 class MutexLockGuard
 {
     public:
-        explicit MutexLockGuard(MutexLockBase &mutex) : _mutex(mutex)
+        explicit MutexLockGuard(MutexLockBase *mutex) : _mutex(mutex)
         {
-            _mutex.lock();
+            if(_mutex != NULL)
+            {
+                _mutex->lock();
+            }
         }
         ~MutexLockGuard()
         {
-            _mutex.unlock();
+            if(_mutex != NULL)
+            {
+                _mutex->unlock();
+            }
         }
     private:
-        MutexLockBase &_mutex;
+        MutexLockBase *_mutex;
 };
 /*
 互斥锁调用通过MutexLockGuard类型实现
