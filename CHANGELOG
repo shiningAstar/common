@@ -4,3 +4,7 @@ v 0.1.1.6
 3. 加入链表获得数据节点宏 list_entry
 4. 添加了代码注释与函数功能说明，添加了List与ListT类的构造与析构函数，添加了二者的函数定义
 5. 修改了ShareMemory带参数的构造函数
+6. 修改了MutexLock中的MutexLockGuard类,将传入的引用变量变为指针。
+7. 修改SemaphoreinProcessPV类中的init函数，添加了win32的宏定义，用来处理windows中的sem_init中的共享标志位必须为0的问题，
+8. 修改SemaphoreoutProcessPV类中的init函数中的sem_open创建失败返回值的判断，增加了返回-1或0xffffffff是错误判断值。
+9. 修改了CurrentThread命名空间中tid()函数，将其中的GerCurrentThread函数换为GerCurrentThreadId()函数。
