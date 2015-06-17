@@ -81,7 +81,9 @@ class SemaphoreOutProcessPV : SemaphoreBase
 
         //V操作，释放共享资源，可能唤起在共享资源上等待的进程（线程）
         bool V();
+        #ifdef _WIN32
         bool V(int res_count);
+        #endif // _WIN32
         #ifndef _WIN32
         int getValue();
         #endif // _WIN32
