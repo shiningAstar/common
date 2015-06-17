@@ -23,3 +23,6 @@ v 0.1.1.6
 16. 调整了Thread类型的状态，存储是否需要在线程启动时detach线程，以提供unjoined线程可以在其他线程join等待(调用waittoStop)，或者选择
     detach线程而自动回收资源，使得join不再起作用。
 17. 修改BlockingInterruptor类型，使初始化端口随机。
+18. 修改SemaphoreOutProcessPV的V(int res_count)函数，使条件编译仅windows可用
+19. 修改NorMap.h，加入了查找接口
+20. 修改NorMap的删除过程，加入了删除后的索引与游标的重置
