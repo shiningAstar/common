@@ -4,7 +4,10 @@
 #include "sys/types.h"
 #include "semaphore.h"
 #include "pthread.h"
-
+#ifdef _WIN32
+#include "windows.h"
+#define sema_name_prefix "sm."
+#endif // _WIN
 class SemaphoreBase
 {
 public:
@@ -13,10 +16,12 @@ public:
 
     virtual bool P() = 0;
     virtual bool P(long wait_sec, long wait_nsec) = 0;
+    #ifndef _WIN32
     virtual bool tryP() = 0;
+    virtual int getValue() = 0;
+    #endif // _WIN32
     virtual bool V() = 0;
     virtual bool V(int res_count) = 0;
-    virtual int getValue() = 0;
     virtual bool available() = 0;
     virtual int getErrno() = 0;
 };
@@ -40,7 +45,9 @@ class SemaphoreInProcessPV : SemaphoreBase
         bool tryP();
         //V操作，释放共享资源，可能唤起在共享资源上等待的进程（线程）
         bool V();
+        #ifdef _WIN32
         bool V(int res_count);
+        #endif // _WIN32
         int getValue();
         bool available();
         int getErrno();
@@ -66,17 +73,29 @@ class SemaphoreOutProcessPV : SemaphoreBase
         bool init(char *name, int open_flag, int value);
         //P操作，减少共享资源，且在没有资源时等待
         bool P();
+
         bool P(long wait_sec, long wait_nsec);
+        #ifndef _WIN32
         bool tryP();
+        #endif // _WIN32
+
         //V操作，释放共享资源，可能唤起在共享资源上等待的进程（线程）
         bool V();
+        #ifdef _WIN32
         bool V(int res_count);
+        #endif // _WIN32
+        #ifndef _WIN32
         int getValue();
+        #endif // _WIN32
         bool available();
         int getErrno();
     protected:
         char name[128];
+        #ifndef _WIN32
         sem_t *psem;
+        #else
+        HANDLE h_sema;
+        #endif // _WIN32
     private:
 };
 

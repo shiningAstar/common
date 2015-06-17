@@ -65,6 +65,76 @@ public:
         iter->second = value;
         return true;
     }
+    bool addValue(keytype key, valuetype value)
+    {
+        typename map<keytype, valuetype>::iterator iter;
+        if(_map == NULL)
+        {
+            return false;
+        }
+        iter = _map->find(key);
+        if(iter != _map->end())
+        {
+            return false;
+        }
+
+        _map->insert(pair<keytype, valuetype>(key, value));
+        cur = _map->begin();
+        index = 0;
+        return true;
+    }
+    bool findValue(keytype key)
+    {
+        typename map<keytype, valuetype>::iterator iter;
+        if(_map == NULL)
+        {
+            return false;
+        }
+        iter = _map->find(key);
+        if(iter == _map->end())
+        {
+            return false;
+        }
+        return true;
+    }
+    bool delValue(keytype key)
+    {
+        typename map<keytype, valuetype>::iterator iter;
+        if(_map == NULL)
+        {
+            return false;
+        }
+        iter = _map->find(key);
+        if(iter == _map->end())
+        {
+            return true;
+        }
+        _map->erase(iter);
+        cur = _map->begin();
+        index = 0;
+        return true;
+    }
+    bool delValue(keytype key, valuetype value)
+    {
+        typename map<keytype, valuetype>::iterator iter;
+        if(_map == NULL)
+        {
+            return false;
+        }
+        iter = _map->find(key);
+        if(iter == _map->end())
+        {
+            return true;
+        }
+        if(iter->second != value)
+        {
+            return false;
+        }
+        _map->erase(iter);
+        cur = _map->begin();
+        index = 0;
+        return true;
+    }
     bool getValue(int index, keytype *key, valuetype *value)
     {
         int size, len;
@@ -177,6 +247,76 @@ public:
             return true;
         }
         iter->second = value;
+        return true;
+    }
+    bool addValue(char *key, int key_len, valuetype value)
+    {
+        typename map<string, valuetype>::iterator iter;
+        if(!corr_string(key, key_len) || _map == NULL)
+        {
+            return false;
+        }
+        iter = _map->find(key);
+        if(iter != _map->end())
+        {
+            return false;
+        }
+
+        _map->insert(pair<string, valuetype>(key, value));
+        cur = _map->begin();
+        index = 0;
+        return true;
+    }
+    bool findValue(char *key, int key_len)
+    {
+        typename map<keytype, valuetype>::iterator iter;
+        if(!corr_string(key, key_len) || _map == NULL)
+        {
+            return false;
+        }
+        iter = _map->find(key);
+        if(iter == _map->end())
+        {
+            return false;
+        }
+        return true;
+    }
+    bool delValue(char *key, int key_len)
+    {
+        typename map<string, valuetype>::iterator iter;
+        if(!corr_string(key, key_len) || _map == NULL)
+        {
+            return false;
+        }
+        iter = _map->find(key);
+        if(iter == _map->end())
+        {
+            return true;
+        }
+        _map->erase(iter);
+        cur = _map->begin();
+        index = 0;
+        return true;
+    }
+    bool delValue(char *key, int key_len, valuetype value)
+    {
+        typename map<string, valuetype>::iterator iter;
+        if(!corr_string(key, key_len) || _map == NULL)
+        {
+            return false;
+        }
+        iter = _map->find(key);
+        if(iter == _map->end())
+        {
+            return true;
+        }
+        if(iter->second != value)
+        {
+            return false;
+        }
+        _map->erase(iter);
+        cur = _map->begin();
+        index = 0;
         return true;
     }
     bool getValue(int index, char *key, int key_len, valuetype *value)
@@ -295,6 +435,76 @@ public:
             return true;
         }
         iter->second = value;
+        return true;
+    }
+    bool addValue(keytype key, char *value, int value_len)
+    {
+        typename map<keytype, string>::iterator iter;
+        if(!corr_string(value, value_len) || _map == NULL)
+        {
+            return false;
+        }
+        iter = _map->find(key);
+        if(iter != _map->end())
+        {
+            return false;
+        }
+
+        _map->insert(pair<keytype, string>(key, value));
+        cur = _map->begin();
+        index = 0;
+        return true;
+    }
+    bool findValue(keytype key)
+    {
+        typename map<keytype, valuetype>::iterator iter;
+        if(_map == NULL)
+        {
+            return false;
+        }
+        iter = _map->find(key);
+        if(iter == _map->end())
+        {
+            return false;
+        }
+        return true;
+    }
+    bool delValue(keytype key)
+    {
+        typename map<keytype, string>::iterator iter;
+        if(_map == NULL)
+        {
+            return false;
+        }
+        iter = _map->find(key);
+        if(iter == _map->end())
+        {
+            return true;
+        }
+        _map->erase(iter);
+        cur = _map->begin();
+        index = 0;
+        return true;
+    }
+    bool delValue(keytype key, char *value, int value_len)
+    {
+        typename map<keytype, string>::iterator iter;
+        if(!corr_string(value, value_len) || _map == NULL)
+        {
+            return false;
+        }
+        iter = _map->find(key);
+        if(iter == _map->end())
+        {
+            return true;
+        }
+        if(strcmp(iter->second.c_str(), value) != 0)
+        {
+            return false;
+        }
+        _map->erase(iter);
+        cur = _map->begin();
+        index = 0;
         return true;
     }
     bool getValue(int index, keytype *key, char *value, int value_len)
@@ -421,6 +631,76 @@ public:
             return true;
         }
         iter->second = value;
+        return true;
+    }
+    bool addValue(char *key, int key_len, char *value, int value_len)
+    {
+        map<string, string>::iterator iter;
+        if(!corr_string(key, key_len) || !corr_string(value, value_len) || _map == NULL)
+        {
+            return false;
+        }
+        iter = _map->find(key);
+        if(iter != _map->end())
+        {
+            return false;
+        }
+
+        _map->insert(pair<string, string>(key, value));
+        cur = _map->begin();
+        index = 0;
+        return true;
+    }
+    bool findValue(char *key, int key_len)
+    {
+        typename map<keytype, valuetype>::iterator iter;
+        if(!corr_string(key, key_len) || _map == NULL)
+        {
+            return false;
+        }
+        iter = _map->find(key);
+        if(iter == _map->end())
+        {
+            return false;
+        }
+        return true;
+    }
+    bool delValue(char *key, int key_len)
+    {
+        map<string, string>::iterator iter;
+        if(!corr_string(key, key_len) || _map == NULL)
+        {
+            return false;
+        }
+        iter = _map->find(key);
+        if(iter == _map->end())
+        {
+            return true;
+        }
+        _map->erase(iter);
+        cur = _map->begin();
+        index = 0;
+        return true;
+    }
+    bool delValue(char *key, int key_len, char *value, int value_len)
+    {
+        map<string, string>::iterator iter;
+        if(!corr_string(key, key_len) || !corr_string(value, value_len) || _map == NULL)
+        {
+            return false;
+        }
+        iter = _map->find(key);
+        if(iter == _map->end())
+        {
+            return true;
+        }
+        if(strcmp(iter->second.c_str(), value) != 0)
+        {
+            return false;
+        }
+        _map->erase(iter);
+        cur = _map->begin();
+        index = 0;
         return true;
     }
     bool getValue(int index, char *key, int key_len, char *value, int value_len)

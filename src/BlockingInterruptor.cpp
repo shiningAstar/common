@@ -16,6 +16,7 @@ class ClientThread : public Thread
 {
 public:
     MySocket *client;
+    unsigned short port;
     unsigned long doWork()
     {
         time_t s, t;
@@ -24,9 +25,10 @@ public:
             return 0;
         }
         s = time(NULL);
-        while(client->Connect("127.0.0.1", 11111) != OK)
+        while(client->Connect("127.0.0.1", port) != OK)
         {
             t = time(NULL);
+            //printf("connect to port %d.s %ud t %ud.\n");
             if(t - s > 5)
                 return 0;
         }
@@ -37,27 +39,34 @@ public:
 bool BlockingInterruptor::init()
 {
     ClientThread thread;
+    //printf("blockinginterrupt init.\n");
     if(server.Create() != OK)
     {
+        printf("server create failed.\n");
         return false;
     }
     if(sock_in.Create() != OK)
     {
+        printf("sock in create failed.\n");
         return false;
     }
 
     thread.client = &sock_in;
-    if(!thread.start())
+    thread.port = rand() % 65536;
+    if(!thread.start(false))
     {
+        printf("thread start failed.\n");
         return false;
     }
 
-    if(server.Bind("127.0.0.1", 11111) != OK)
+    if(server.Bind("127.0.0.1", thread.port) != OK)
     {
+        printf("server bind failed.\n");
         return false;
     }
     if(server.Listen(1) != OK)
     {
+        printf("server listen failed.\n");
         return false;
     }
 
@@ -70,10 +79,12 @@ bool BlockingInterruptor::init()
 
     if(server.SelectWait(FD_READ, 5000) != FD_READ)
     {
+        printf("server select failed.\n");
         return false;
     }
     if(server.Accept_s(&sock_out) != OK)
     {
+        printf("server accept failed.\n");
         return false;
     }
     server.Close();

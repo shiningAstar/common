@@ -5,7 +5,7 @@
 #define prefix "sharememory."
 
 #if defined(WIN32) || defined(_WINDOWS) || defined(_WIN32)
-int sharememory_use_global_name = 1;
+int sharememory_use_global_name = 0;
 void sm_use_global_name(int is_use)
 {
 	if(is_use)
@@ -58,10 +58,19 @@ SharedMemory::~SharedMemory()
 #endif
 }
 
-SharedMemory::SharedMemory(char *name, size_t size)
+SharedMemory::SharedMemory(char *name, size_t size): SharedMemory()
 {
-    SharedMemory();
     init(name, size);
+}
+
+void *SharedMemory::getAddr()
+{
+    return mem_ptr;
+}
+
+unsigned long SharedMemory::getSize()
+{
+    return size;
 }
 
 bool SharedMemory::init(char *name, size_t size)
@@ -197,7 +206,6 @@ filemap:
     }
 
 #endif
-
     //printf("shm_init:  %x---%x\n",p_shm,p_shm->shm);
     return true;
 }

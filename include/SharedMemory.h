@@ -19,6 +19,9 @@ class SharedMemory
 
         bool init(char *name, size_t size);
 
+        void *getAddr();
+        unsigned long getSize();
+
     protected:
         char name[128];
         size_t size;

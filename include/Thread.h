@@ -24,13 +24,14 @@ class Thread
         static void *threadProc(void *arg);
         //#endif // _WIN32
         virtual unsigned long doWork() = 0;
-        bool start(pthread_attr_t *attr = NULL);
+        bool start(bool detached = true, pthread_attr_t *attr = NULL);
         THREAD_STATUS getStatus();
         bool waittoStop(void **ret=NULL);
     protected:
         pthread_t tid;
         pthread_attr_t attr;
         THREAD_STATUS status;
+        bool detached;
     private:
 };
 

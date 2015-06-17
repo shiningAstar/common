@@ -61,7 +61,7 @@ public:
 	static void SetUShort(unsigned char* Buf,unsigned short Val);
 };
 
-#define  INVALID_SOCKET  -1
+#define  INVALID_SOCKET  0xFFFFFFFF
 #define  SOCKET_ERROR    -1
 #define  FD_NONE      0x00
 #define  FD_READ  	   0x01
@@ -138,10 +138,15 @@ public:
 	} SockRetCode;
 protected:
 	SOCKET		m_socket;
+	int         m_domain;
 	int			m_nSocketType;
 	struct sockaddr	   m_sockLocal;
 	struct sockaddr	   m_sockDest;
 	struct sockaddr    m_sockRecvFrom;
+#ifndef _WIN32
+    struct sockaddr_un m_sockLocalPath;
+    struct sockaddr_un m_sockLocalClientPath;
+#endif
 	char        m_MulticastIp[20];
 public:
 	MySocket();
@@ -169,6 +174,7 @@ public:
 
 #endif
 	int Create(int nSocketType = SOCK_STREAM/*SOCK_DGRAM*/);
+	int Create(int domain, int nSocketType);
 	int CreateClient(char* Address,UINT Port,int nSocketType=SOCK_STREAM/*SOCK_DGRAM*/,int BufSize=-1);
 	int CreateClient(char* Address,char* Port,int nSocketType=SOCK_STREAM/*SOCK_DGRAM*/,int BufSize=-1 );
 	int CreateMulticast(char* Address,int Port,int BufSize=-1);
@@ -185,6 +191,7 @@ public:
 	int Connect(char* destAddr,int destPort);
 	int Connect(char* destAddr,int destPort,long MSec);
 	int Listen(int BackLog);
+	//不支持本地socket， 下面的两个支持
 	SOCKET Accept(struct sockaddr *cliaddr,socklen_t *addrlen);
 	int    Accept(MySocket *&rs);
 	//要求rs为一个存在的MySocket类型的地址，且未初始化Create
@@ -233,6 +240,9 @@ public:
 	int SetDestNetAddr(long destIP, short destPort);
 	int SetDestAddr(struct sockaddr* addr);
 	int SetLocalAddr(struct sockaddr* addr);
+#ifndef _WIN32
+	int SetDestAddrPath(struct sockaddr_un* destAddr);
+#endif // _WIN32
 
 public:
 
