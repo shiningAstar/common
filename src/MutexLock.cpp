@@ -76,7 +76,7 @@ bool MutexLockInProcess::lockedByThisThread()
 MutexLockOutProcess::MutexLockOutProcess() : _holder(0)
 {
     //ctor
-    _holder = 0;
+    //_holder = 0;
 }
 
 MutexLockOutProcess::MutexLockOutProcess(char *name, int open_flag):MutexLockOutProcess()
@@ -157,6 +157,7 @@ bool MutexLockOutProcess::init(char *name, int open_flag)
 
         if( GetLastError() == ERROR_ALREADY_EXISTS )
         {
+            CloseHandle(h_mutex);
             return false;
         }
 

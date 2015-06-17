@@ -12,7 +12,7 @@
     #include "sys/types.h"
 #endif // _WIN32
 
-Thread::Thread() :  status(STOPPING)
+Thread::Thread() :  status(STOPPING), detached(true)
 {
     //ctor
 }
@@ -22,11 +22,15 @@ Thread::~Thread()
     //dtor
 }
 
-bool Thread::start(pthread_attr_t *attr)
+bool Thread::start(bool detached, pthread_attr_t *attr)
 {
     if(attr != NULL)
     {
         memcpy(&(this->attr), attr, sizeof(pthread_attr_t));
+    }
+    if(!detached)
+    {
+        this->detached = false;
     }
     if(pthread_create(&tid, attr, Thread::threadProc, this) < 0)
     {
@@ -56,12 +60,15 @@ void *Thread::threadProc(void *arg)
 {
     Thread *thread;
     void *ret;
-    pthread_detach(pthread_self());
     if(arg == NULL)
     {
         return NULL;
     }
     thread = (Thread*)arg;
+    if(thread->detached)
+    {
+        pthread_detach(pthread_self());
+    }
     thread->status = RUNNING;
     ret = (void*)thread->doWork();
     thread->status = STOPPING;

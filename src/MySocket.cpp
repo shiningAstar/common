@@ -179,10 +179,18 @@ void MySocket::CloseMulticast()
 
 int MySocket::Create(int nSocketType)
 {
+	return Create(AF_INET, nSocketType);
+}
+
+int MySocket::Create(int domain, int nSocketType)
+{
 	if(m_socket != SockInvalid)
-		return FAIL;
+    {
+        Close();
+    }
 	m_nSocketType = nSocketType;
-	m_socket = socket(PF_INET, m_nSocketType, 0 );
+	m_domain = domain;
+	m_socket = socket(m_domain, m_nSocketType, 0);
 	if(m_socket==SockInvalid) return FAIL;
 	else return OK;
 }
@@ -251,7 +259,36 @@ int MySocket::Connect(char* destAddr,char* destPort)
 	char   phebuf[1024];
 	int    herr;
     struct sockaddr_in sin;
+#ifndef _WIN32
+    int addr_len;
+#endif // _WIN32
+    if(destAddr == NULL || destPort == NULL)
+    {
+        return FAIL;
+    }
+#ifndef _WIN32
 
+    if(m_domain != AF_LOCAL && m_domain != AF_UNIX)
+    {
+        goto normal;
+    }
+//linux本地socket
+    m_sockLocalPath.sun_family = m_domain;
+    strncpy(&m_sockLocalPath.sun_path[1],destAddr,sizeof(srv_addr.sun_path)-2);
+    m_sockLocalPath[0] = 0;
+    addr_len = ((char *)m_sockLocalPath.sun_path) - ((char*)&m_sockLocalPath) + strlen(destAddr);
+
+    if(connect(m_socket, (struct sockaddr*)&m_sockLocalPath, addr_len)==SockError)
+	{
+		close(m_socket);
+		m_socket = SockInvalid;
+	}
+
+	return OK;
+
+#endif // _WIN32
+//网络socket
+normal:
 	memset(&sin,0,sizeof(sin));
 	sin.sin_family = AF_INET;
 	if ((sin.sin_port = htons((u_short)atoi(destPort)))==0)
@@ -297,14 +334,12 @@ int MySocket::Connect(char* destAddr,char* destPort)
 	{
 		close(m_socket);
 		m_socket = SockInvalid;
+		return FAIL;
 	}
 
-	if(m_socket==SockInvalid) return FAIL;
-	else
-	{
-		ObtainLocalAddr();
-		return OK;
-	}
+    ObtainLocalAddr();
+    return OK;
+
 }
 
 int MySocket::Connect(char* destAddr,int destPort,long MSec)
@@ -313,7 +348,56 @@ int MySocket::Connect(char* destAddr,int destPort,long MSec)
 	char phebuf[1024];
 	int  herr;
     struct sockaddr_in sin;
+    int ret;
+#ifndef _WIN32
+    int addr_len;
+#endif // _WIN32
+    if(destAddr == NULL || destPort == NULL)
+    {
+        return FAIL;
+    }
+#ifndef _WIN32
 
+    if(m_domain != AF_LOCAL && m_domain != AF_UNIX)
+    {
+        goto normal;
+    }
+//linux本地socket
+    m_sockLocalPath.sun_family = m_domain;
+    strncpy(&m_sockLocalPath.sun_path[1],destAddr,sizeof(srv_addr.sun_path)-2);
+    m_sockLocalPath[0] = 0;
+    addr_len = ((char *)m_sockLocalPath.sun_path) - ((char*)&m_sockLocalPath) + strlen(destAddr);
+
+    SetNonBlockMode(1);
+    ret = connect(m_socket, (struct sockaddr*)&m_sockLocalPath, addr_len);
+	if(ret!=0){
+		fd_set fdw,fdr;
+		FD_ZERO( &fdw );
+		FD_SET(m_socket, &fdw );
+		fdr = fdw;
+		ret = Select(&fdr,&fdw,NULL,MSec);
+		if(ret<=0){
+	    	SetNonBlockMode(0);
+			close(m_socket);
+			m_socket = SockInvalid;
+			return TIMEOUT;
+		}
+		else{
+			if(FD_ISSET(m_socket,&fdr) || !FD_ISSET(m_socket,&fdw)){
+				SetNonBlockMode(0);
+				close(m_socket);
+				m_socket = SockInvalid;
+				return FAIL;
+			}
+		}
+	}
+    SetNonBlockMode(0);
+
+	return OK;
+
+#endif // _WIN32
+//网络socket
+normal:
 	memset(&sin,0,sizeof(sin));
 	sin.sin_family = AF_INET;
 	if ((sin.sin_port = htons((u_short)destPort))==0)
@@ -357,7 +441,7 @@ int MySocket::Connect(char* destAddr,int destPort,long MSec)
 	}
 
 	SetNonBlockMode(1);
-	int ret = connect(m_socket, (struct sockaddr*)&m_sockDest, sizeof(m_sockDest));
+	ret = connect(m_socket, (struct sockaddr*)&m_sockDest, sizeof(m_sockDest));
 	if(ret!=0){
 		fd_set fdw,fdr;
 		FD_ZERO( &fdw );
@@ -381,12 +465,9 @@ int MySocket::Connect(char* destAddr,int destPort,long MSec)
 	}
     SetNonBlockMode(0);
 
-	if(m_socket==SockInvalid) return FAIL;
-	else
-	{
-		ObtainLocalAddr();
-		return OK;
-	}
+    ObtainLocalAddr();
+    return OK;
+
 
 }
 
@@ -854,6 +935,33 @@ int MySocket::Bind(char *localAddr, char *localPort)
     char  phebuf[1024];
     int   herr;
     struct sockaddr_in sin;
+#ifndef _WIN32
+    int addr_len;
+#endif // _WIN32
+    if(localAddr == NULL || localPort == NULL)
+    {
+        return FAIL;
+    }
+#ifndef _WIN32
+
+    if(m_domain != AF_LOCAL && m_domain != AF_UNIX)
+    {
+        goto normal;
+    }
+//linux本地socket
+    m_sockLocalPath.sun_family = m_domain;
+    strncpy(&m_sockLocalPath.sun_path[1],localAddr,sizeof(srv_addr.sun_path)-2);
+    m_sockLocalPath[0] = 0;
+    addr_len = ((char *)m_sockLocalPath.sun_path) - ((char*)&m_sockLocalPath) + strlen(localAddr);
+
+    if(bind(m_socket,(struct sockaddr*)&m_sockLocalPath,addr_len)==SockError)
+	{
+		return FAIL;
+	}
+
+	return OK;
+#endif // _WIN32
+normal:
 	memset(&sin,0,sizeof(sin));
 	sin.sin_family = AF_INET;
 	sin.sin_port = htons((u_short)atoi(localPort));
@@ -902,6 +1010,29 @@ int  MySocket::Accept(MySocket *&newrs)
 {
 	socklen_t addrlen = sizeof(struct sockaddr);
 	SOCKET newsocket;
+#ifndef _WIN32
+
+    if(m_domain != AF_LOCAL && m_domain != AF_UNIX)
+    {
+        goto normal;
+    }
+    addr = sizeof(m_sockLocalClientPath);
+    while((newsocket = Accept((sockaddr *)&m_sockLocalClientPath,&addrlen)) < 0)
+    {
+        if(errno != EINTR) break;
+    }
+    if(newsocket>=0){
+		newrs = new MySocket;
+		newrs->SetSocket(newsocket);
+		newrs->setDestAddrPath(&m_sockLocalClientPath);
+		return OK;
+	}
+	else{
+		return FAIL;
+	}
+
+#endif // _WIN32
+normal:
 	while((newsocket = Accept(&m_sockDest,&addrlen))<0){
 		if(errno!=EINTR) break;
 	}
@@ -925,10 +1056,33 @@ int  MySocket::Accept_s(MySocket *newrs)
     {
         return FAIL;
     }
-	while((newsocket = Accept(&m_sockDest,&addrlen))<0){
+#ifndef _WIN32
+
+    if(m_domain != AF_LOCAL && m_domain != AF_UNIX)
+    {
+        goto normal;
+    }
+    addr = sizeof(m_sockLocalClientPath);
+    while((newsocket = Accept((sockaddr *)&m_sockLocalClientPath,&addrlen)) < 0)
+    {
+        if(errno != EINTR) break;
+    }
+    if(newsocket>=0){
+		newrs->SetSocket(newsocket);
+		newrs->setDestAddrPath(&m_sockLocalClientPath);
+		return OK;
+	}
+	else{
+		return FAIL;
+	}
+
+#endif // _WIN32
+normal:
+	while((newsocket = Accept(&m_sockDest,&addrlen))==SockInvalid){
+		//printf("errno %d.\n", errno);
 		if(errno!=EINTR) break;
 	}
-	if(newsocket>=0){
+	if(newsocket!=SockInvalid){
 		newrs->SetSocket(newsocket);
 		newrs->SetDestAddr(&m_sockDest);
 		newrs->ObtainLocalAddr();
@@ -1046,6 +1200,14 @@ int MySocket::SetDestAddr(struct sockaddr* destAddr)
 	memcpy(&m_sockDest,destAddr,sizeof(m_sockDest));
 	return OK;
 }
+#ifndef _WIN32
+int MySocket::SetDestAddrPath(struct sockaddr_un* destAddr)
+{
+	//m_sockDest = *destAddr;
+	memcpy(&m_sockLocalPath,destAddr,sizeof(m_sockLocalPath));
+	return OK;
+}
+#endif // _WIN32
 
 int MySocket::ObtainLocalAddr()
 {

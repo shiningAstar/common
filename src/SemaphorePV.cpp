@@ -60,7 +60,7 @@ bool SemaphoreInProcessPV::init(int value)
         return false;
     }
 
-   #ifdef _WIN32
+#ifdef _WIN32
     if(sem_init(&sem, 0, value) < 0)
     {
 
@@ -340,6 +340,7 @@ bool SemaphoreOutProcessPV::init(char *name, int open_flag, int value)
 
             if(GetLastError() == ERROR_ALREADY_EXISTS)
             {
+                CloseHandle(h_sema);
                 return false;
             }
          break;

@@ -8,13 +8,18 @@ v 0.1.1.6
 7. 修改SemaphoreinProcessPV类中的init函数，添加了win32的宏定义，用来处理windows中的sem_init中的共享标志位必须为0的问题，
 8. 修改SemaphoreoutProcessPV类中的init函数中的sem_open创建失败返回值的判断，增加了返回-1或0xffffffff是错误判断值。
 9. 修改了CurrentThread命名空间中tid()函数，将其中的GerCurrentThread函数换为GerCurrentThreadId()函数。
-10. 修改了MutexLock.h中的MutexLockOutProcess类，添加了linux的条件编译，添加了windows下的变量
-h_mutex用于接收句柄。添加了enum类型的标志
+10. 修改了MutexLock.h中的MutexLockOutProcess类，添加了linux的条件编译，添加了windows下的变量，
+    h_mutex用于接收句柄。添加了enum类型的标志
 11. 修改了SemaphorePV.h中的SemvphoreoutPorcessPV类，添加了windows和Linux的调按键编译，添加了
-windows下的变量h_sema用于接收句柄，添加了对tryp(),getvalue()的条件编译
+    windows下的变量h_sema用于接收句柄，添加了对tryp(),getvalue()的条件编译
 12. 修改了MutexLock.cpp中的MutexLockOutProcess类，添加了linux的条件编译，修改了带参数的构造函数,
-修改了init函数，添加了windows条件下的互斥锁的初始化，修改了lock函数添加了windows下的互斥锁的实现，
-修改了unlock函数，添加了windows下互斥锁的解锁，修改了析构函数。添加了windows下的句柄关闭。
+    修改了init函数，添加了windows条件下的互斥锁的初始化，修改了lock函数添加了windows下的互斥锁的实现，
+    修改了unlock函数，添加了windows下互斥锁的解锁，修改了析构函数。添加了windows下的句柄关闭。
 13. 修改了SemaphorePV.cpp中的SemvphoreoutPorcessPV类的成员函数，修改了带参数与不带参数的构造函数，修改了
-析构函数，修改了p(),p(sec,nsec)函数，v(),v(value)函数，init函数，对这些函数，添加了条件编译，增加了windows下的跨进程信号量实现代码。
-同时添加了对getvalue函数的条件编译使其不再windows下出现
+    析构函数，修改了p(),p(sec,nsec)函数，v(),v(value)函数，init函数，对这些函数，添加了条件编译，增加了windows下的跨进程信号量实现代码。
+    同时添加了对getvalue函数的条件编译使其不再windows下出现
+14. 修改了SemvphoreoutPorcessPV与MutexLockOutProcess的init函数中Create存在时未关闭句柄的bug。
+15. 调整了MySocket的Create接口，与一些与地址、协议类型有关的函数，使得可以在创建时指定domain，从而实现创建本地socket
+16. 调整了Thread类型的状态，存储是否需要在线程启动时detach线程，以提供unjoined线程可以在其他线程join等待(调用waittoStop)，或者选择
+    detach线程而自动回收资源，使得join不再起作用。
+17. 修改BlockingInterruptor类型，使初始化端口随机。
