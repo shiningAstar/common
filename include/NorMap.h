@@ -5,9 +5,7 @@
 #include "string"
 #include "base.h"
 #include "string.h"
-/**
-    注意：delvalue()函数使用时，未找到与要删除的键对匹配的键值时，返回true，若键值正确，value错误，返回false
-*/
+
 using namespace std;
 
 template <typename keytype, typename valuetype>
@@ -85,6 +83,20 @@ public:
         index = 0;
         return true;
     }
+    bool findValue(keytype key)
+    {
+        typename map<keytype, valuetype>::iterator iter;
+        if(_map == NULL)
+        {
+            return false;
+        }
+        iter = _map->find(key);
+        if(iter == _map->end())
+        {
+            return false;
+        }
+        return true;
+    }
     bool delValue(keytype key)
     {
         typename map<keytype, valuetype>::iterator iter;
@@ -98,6 +110,8 @@ public:
             return true;
         }
         _map->erase(iter);
+        cur = _map->begin();
+        index = 0;
         return true;
     }
     bool delValue(keytype key, valuetype value)
@@ -117,6 +131,8 @@ public:
             return false;
         }
         _map->erase(iter);
+        cur = _map->begin();
+        index = 0;
         return true;
     }
     bool getValue(int index, keytype *key, valuetype *value)
@@ -251,6 +267,20 @@ public:
         index = 0;
         return true;
     }
+    bool findValue(char *key, int key_len)
+    {
+        typename map<keytype, valuetype>::iterator iter;
+        if(!corr_string(key, key_len) || _map == NULL)
+        {
+            return false;
+        }
+        iter = _map->find(key);
+        if(iter == _map->end())
+        {
+            return false;
+        }
+        return true;
+    }
     bool delValue(char *key, int key_len)
     {
         typename map<string, valuetype>::iterator iter;
@@ -264,6 +294,8 @@ public:
             return true;
         }
         _map->erase(iter);
+        cur = _map->begin();
+        index = 0;
         return true;
     }
     bool delValue(char *key, int key_len, valuetype value)
@@ -283,6 +315,8 @@ public:
             return false;
         }
         _map->erase(iter);
+        cur = _map->begin();
+        index = 0;
         return true;
     }
     bool getValue(int index, char *key, int key_len, valuetype *value)
@@ -421,6 +455,20 @@ public:
         index = 0;
         return true;
     }
+    bool findValue(keytype key)
+    {
+        typename map<keytype, valuetype>::iterator iter;
+        if(_map == NULL)
+        {
+            return false;
+        }
+        iter = _map->find(key);
+        if(iter == _map->end())
+        {
+            return false;
+        }
+        return true;
+    }
     bool delValue(keytype key)
     {
         typename map<keytype, string>::iterator iter;
@@ -434,6 +482,8 @@ public:
             return true;
         }
         _map->erase(iter);
+        cur = _map->begin();
+        index = 0;
         return true;
     }
     bool delValue(keytype key, char *value, int value_len)
@@ -453,6 +503,8 @@ public:
             return false;
         }
         _map->erase(iter);
+        cur = _map->begin();
+        index = 0;
         return true;
     }
     bool getValue(int index, keytype *key, char *value, int value_len)
@@ -599,6 +651,20 @@ public:
         index = 0;
         return true;
     }
+    bool findValue(char *key, int key_len)
+    {
+        typename map<keytype, valuetype>::iterator iter;
+        if(!corr_string(key, key_len) || _map == NULL)
+        {
+            return false;
+        }
+        iter = _map->find(key);
+        if(iter == _map->end())
+        {
+            return false;
+        }
+        return true;
+    }
     bool delValue(char *key, int key_len)
     {
         map<string, string>::iterator iter;
@@ -612,6 +678,8 @@ public:
             return true;
         }
         _map->erase(iter);
+        cur = _map->begin();
+        index = 0;
         return true;
     }
     bool delValue(char *key, int key_len, char *value, int value_len)
@@ -631,6 +699,8 @@ public:
             return false;
         }
         _map->erase(iter);
+        cur = _map->begin();
+        index = 0;
         return true;
     }
     bool getValue(int index, char *key, int key_len, char *value, int value_len)
