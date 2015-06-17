@@ -46,6 +46,9 @@ class MutexLockInProcess : MutexLockBase
 class MutexLockOutProcess : MutexLockBase
 {
     public:
+        #ifdef _WIN32
+        enum mutex_openflag{OPEN_EXIST, OPEN_OR_CREATE, CREATE_ONLY};
+        #endif // _WIN32
         /** Default constructor */
         MutexLockOutProcess();
         MutexLockOutProcess(char *name, int open_flag);
@@ -57,8 +60,11 @@ class MutexLockOutProcess : MutexLockBase
     protected:
 
         pid_t _holder; //!< Member variable "_holder;"
-
+        #ifndef _WIN32
         SemaphoreOutProcessPV sem;
+        #else
+        HANDLE h_mutex;
+        #endif // _WIN32
     private:
 
 };

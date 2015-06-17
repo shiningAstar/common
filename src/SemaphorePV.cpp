@@ -3,7 +3,16 @@
 #include "string.h"
 #include "fcntl.h"
 #include "Error.h"
+#include "stdio.h"
+#ifdef _WIN32
+int g_sema_use_global_name = 1;
+#endif // _WIN32
+#define _DEBUG
 
+
+#ifdef _DEBUG
+#include "stdio.h"
+#endif // _DEBUG
 SemaphoreBase::SemaphoreBase()
 {
 
@@ -241,20 +250,30 @@ SemaphoreOutProcessPV::SemaphoreOutProcessPV()
 {
     //ctor
     memset(this->name, 0, sizeof(name));
+    #ifndef _WIN32
     psem = NULL;
+    #else
+    h_sema = NULL;
+    #endif // _WIN32
+
 }
 
-SemaphoreOutProcessPV::SemaphoreOutProcessPV(char *name, int open_flag, int value)
+SemaphoreOutProcessPV::SemaphoreOutProcessPV(char *name, int open_flag, int value):SemaphoreOutProcessPV()
 {
-    SemaphoreOutProcessPV();
+
     init(name, open_flag, value);
 }
 
 SemaphoreOutProcessPV::~SemaphoreOutProcessPV()
 {
     //dtor
+    #ifndef _WIN32
     sem_close(psem);
     sem_unlink(name);
+    #else
+    CloseHandle(h_sema);
+    #endif // _WIN32
+
 
 }
 
@@ -265,35 +284,104 @@ bool SemaphoreOutProcessPV::init(char *name, int open_flag, int value)
     {
         return false;
     }
+    #ifdef _WIN32
+	char filename[128]={0};
+	MEMORY_BASIC_INFORMATION  mm_info;
+	SECURITY_ATTRIBUTES sa ={0};
+	SECURITY_DESCRIPTOR sd ={0};
+
+	InitializeSecurityDescriptor( &sd, SECURITY_DESCRIPTOR_REVISION );
+	SetSecurityDescriptorDacl(&sd,TRUE,NULL,FALSE);  //pDACL参数传NULL表示建立NULL DACL，允许所有的访问
+
+	sa.nLength = sizeof(sa);
+    sa.lpSecurityDescriptor = &sd;
+    sa.bInheritHandle = FALSE;
+
+	if(g_sema_use_global_name)
+		strncpy(filename,"Global\\",64);
+
+	strncat(filename,sema_name_prefix,64);
+	strncat(filename,name,64);
+    #endif // _WIN32
+
+    #ifndef _WIN32
     switch(open_flag)
     {
         case OPEN_EXIST: oflag = 0; break;
         case OPEN_OR_CREATE: oflag = O_CREAT; break;
         case CREATE_ONLY: oflag = O_CREAT | O_EXCL; break;
     }
+
     if((psem = (sem_t*)sem_open(name, oflag, 666, value)) == SEM_FAILED || psem == (sem_t*)0xfffffffff )
     {
         psem = NULL;
         return false;
     }
+    #else
+
+     switch(open_flag)
+    {
+        case OPEN_EXIST:
+            if( ( h_sema = OpenSemaphoreA( SEMAPHORE_ALL_ACCESS , TRUE, filename ) ) == NULL )
+                return false;
+            break;
+        case OPEN_OR_CREATE:
+            if( ( h_sema = CreateSemaphoreA( &sa, value, 666, filename ) ) == NULL )
+                {
+                    return false;
+                }
+            break;
+        case CREATE_ONLY:
+            SetLastError(0);
+            if( ( h_sema = CreateSemaphoreA( &sa, value, 666, filename ) ) == NULL)
+               {
+                  return false;
+               }
+
+            if(GetLastError() == ERROR_ALREADY_EXISTS)
+            {
+                return false;
+            }
+         break;
+    }
+    #endif // _WIN32
+
     strncpy(this->name, name, sizeof(this->name));
     return true;
 }
 
 bool SemaphoreOutProcessPV::P()
 {
-    if(psem == NULL)
-    {
-        return false;
-    }
-    if(sem_wait(psem) < 0)
-    {
-        return false;
-    }
+#ifndef _WIN32
+
+        if( psem == NULL )
+        {
+            return false;
+        }
+
+        if( sem_wait( psem ) < 0 )
+        {
+            return false;
+        }
+
+#else
+
+        if( h_sema == NULL )
+        {
+            return false;
+        }
+
+        if( WaitForSingleObject( h_sema, INFINITE ) == WAIT_FAILED )
+        {
+            return false;
+        }
+#endif // _WIN32
     return true;
 }
+
 bool SemaphoreOutProcessPV::P(long wait_sec, long wait_nsec)
 {
+    #ifndef _WIN32
     timespec time;
     if((wait_sec == 0 && wait_nsec == 0) || wait_sec < 0 || wait_nsec < 0)
     {
@@ -309,8 +397,16 @@ bool SemaphoreOutProcessPV::P(long wait_sec, long wait_nsec)
     {
         return false;
     }
+    #else
+    if(WaitForSingleObject(h_sema,wait_nsec+wait_sec * 1000) == WAIT_TIMEOUT)
+    {
+        return false;
+    }
+    #endif // _WIN32
+
     return true;
 }
+#ifndef _WIN32
 bool SemaphoreOutProcessPV::tryP()
 {
     if(psem == NULL)
@@ -323,41 +419,70 @@ bool SemaphoreOutProcessPV::tryP()
     }
     return true;
 }
+#endif // _WIN32
 
 bool SemaphoreOutProcessPV::V()
 {
-    if(psem == NULL)
-    {
-        return false;
-    }
-    if(sem_post(psem) < 0)
-    {
-        return false;
-    }
-    return true;
+
+#ifndef _WIN32
+
+        if( psem == NULL )
+        {
+            return false;
+        }
+
+        if( sem_post( psem ) < 0 )
+        {
+            return false;
+        }
+
+#else
+        LONG lpl = 0 ;
+        if( h_sema == NULL )
+        {
+            return false;
+        }
+
+        if( ReleaseSemaphore( h_sema, 1, &lpl ) == false )
+        {
+            return false;
+        }
+
+        #ifdef _DEBUG
+        printf("the value after v is %d\n",lpl + 1);
+        #endif // _DEBUG
+#endif // _WIN32
+
+        return true;
 }
 
 #ifdef _WIN32
 
 bool SemaphoreOutProcessPV::V(int res_count)
 {
+    LONG lpl = 0 ;
     if(res_count <= 0 || res_count > SEM_VALUE_MAX)
     {
         return false;
     }
-    if(psem == NULL)
+    if(h_sema == NULL)
     {
         return false;
     }
-    if(sem_post_multiple(psem, res_count) < 0)
+
+    if(ReleaseSemaphore(h_sema,res_count,&lpl) == false)
     {
         return false;
     }
+    #ifdef _DEBUG
+    printf("the value after v is %d\n",lpl + res_count);
+    #endif // _DEBUG
     return true;
 }
 
 #endif
 
+#ifndef _WIN32
 int SemaphoreOutProcessPV::getValue()
 {
     int value;
@@ -374,12 +499,23 @@ int SemaphoreOutProcessPV::getValue()
     return value;
 
 }
+#endif // _WIN32
 bool SemaphoreOutProcessPV::available()
 {
+#ifndef _WIN32
     return psem != NULL;
+#else
+    return h_sema != NULL;
+#endif // _WIN32
+
 }
 
 int SemaphoreOutProcessPV::getErrno()
 {
-    return Error::no();
+#ifndef _WIN32
+        return Error::no();
+#else
+        return GetLastError();
+#endif // _WIN32
+
 }
