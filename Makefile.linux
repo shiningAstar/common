@@ -10,7 +10,7 @@ vpath %.cpp src/
 
 none_objects = main.o File.o logBase.o logTerminal.o logFile.o ControlwithLog.o \
 					logControl.o log.o MySocket.o MutexLock.o ConfigBase.o FileConfig.o \
-					SemaphorePV.o Thread.o SharedMemory.o
+					SemaphorePV.o Thread.o SharedMemory.o  Crc.o FuncPtrMap.o BlockingInterruptor.o
 
 objects_release = $(foreach file, $(none_objects), $(patsubst %.o, %_release.o, $(file)))
 objects_debug = $(foreach file, $(none_objects), $(patsubst %.o, %_debug.o, $(file)))
@@ -19,7 +19,8 @@ obj_files_release = $(foreach file, $(objects_release),$(dir_obj_release)/$(file
 obj_files_debug = $(foreach file, $(objects_debug),$(dir_obj_debug)/$(file))
 
 h_export = logBase.h logFile.h logTerminal.h File.h ControlwithLog.h logControl.h log.h MySocket.h MutexLock.h \
-			ConfigBase.h FileConfig.h SemaphorePV.h Thread.h Error.h SharedMemory.h
+			ConfigBase.h FileConfig.h SemaphorePV.h Thread.h Error.h SharedMemory.h BlockingInterruptor.h \
+			NorMap.h List.h Crc.h base.h FuncPtrMap.h
 
 h_export_file = $(foreach file, $(h_export), ./include/$(file))
 
@@ -42,7 +43,7 @@ all : Debug Release
 clean : cleanDebug cleanRelease
 
 ReleaseCompile : ReleaseDir $(objects_release)
-	$(compile_lib) $(flags_release) $(obj_files_release) -o $(target_lib_name_release) -s   -lpthread
+	$(compile_lib) $(flags_release) $(obj_files_release) -o $(target_lib_name_release) -s   -lpthread -lrt
 
 Release : ReleaseCompile
 	$(shell if [ -f '../create/include' ]; then echo "exist"; else mkdir -p '../create/include'; fi;)
@@ -51,7 +52,7 @@ Release : ReleaseCompile
 	$(shell cp ./bin/release/*.* ../create/bin/release;)
 
 DebugCompile : DebugDir $(objects_debug)
-	$(compile_lib) $(flags_debug) $(obj_files_debug) -o $(target_lib_name_debug)  -lpthread
+	$(compile_lib) $(flags_debug) $(obj_files_debug) -o $(target_lib_name_debug)  -lpthread -lrt
 
 Debug : DebugCompile
 	$(shell if [ -f '../create/include' ]; then echo "exist"; else mkdir -p '../create/include'; fi;)

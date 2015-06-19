@@ -79,7 +79,7 @@ MutexLockOutProcess::MutexLockOutProcess() : _holder(0)
     //_holder = 0;
 }
 
-MutexLockOutProcess::MutexLockOutProcess(char *name, int open_flag):MutexLockOutProcess()
+MutexLockOutProcess::MutexLockOutProcess(char *name, int open_flag):_holder(0)
 {
 
     init(name, open_flag);

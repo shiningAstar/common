@@ -274,8 +274,8 @@ int MySocket::Connect(char* destAddr,char* destPort)
     }
 //linux本地socket
     m_sockLocalPath.sun_family = m_domain;
-    strncpy(&m_sockLocalPath.sun_path[1],destAddr,sizeof(srv_addr.sun_path)-2);
-    m_sockLocalPath[0] = 0;
+    strncpy(&m_sockLocalPath.sun_path[1],destAddr,sizeof(m_sockLocalPath.sun_path)-2);
+    m_sockLocalPath.sun_path[0] = 0;
     addr_len = ((char *)m_sockLocalPath.sun_path) - ((char*)&m_sockLocalPath) + strlen(destAddr);
 
     if(connect(m_socket, (struct sockaddr*)&m_sockLocalPath, addr_len)==SockError)
@@ -364,8 +364,8 @@ int MySocket::Connect(char* destAddr,int destPort,long MSec)
     }
 //linux本地socket
     m_sockLocalPath.sun_family = m_domain;
-    strncpy(&m_sockLocalPath.sun_path[1],destAddr,sizeof(srv_addr.sun_path)-2);
-    m_sockLocalPath[0] = 0;
+    strncpy(&m_sockLocalPath.sun_path[1],destAddr,sizeof(m_sockLocalPath.sun_path)-2);
+    m_sockLocalPath.sun_path[0] = 0;
     addr_len = ((char *)m_sockLocalPath.sun_path) - ((char*)&m_sockLocalPath) + strlen(destAddr);
 
     SetNonBlockMode(1);
@@ -523,7 +523,12 @@ int MySocket::SelectWaitInterruptable(BlockingInterruptor *interruptor, long SEv
 		FD_ZERO(&fdr);
 		pfdr = &fdr;
 		FD_SET(m_socket, &fdr);
+		#ifdef _WIN32
 		FD_SET(interruptor->getSockOut()->GetSocket(), &fdr);
+		#else
+		int *fdctr = interruptor->getFdctr();
+		FD_SET(fdctr[0], &fdr);
+		#endif
 	}
 	if(SEvent & FD_WRITE){
 		FD_ZERO(&fdw);
@@ -532,7 +537,13 @@ int MySocket::SelectWaitInterruptable(BlockingInterruptor *interruptor, long SEv
 	}
 	int sn=Select(pfdr,pfdw, NULL,MSec);
 	if (sn > 0){
-        if(FD_ISSET(interruptor->getSockOut()->GetSocket(), pfdr))
+            #ifdef _WIN32
+            if(FD_ISSET(interruptor->getSockOut()->GetSocket(), pfdr))
+            #else
+            int *fdctl = interruptor->getFdctr();
+            if(FD_ISSET(fdctl[0],pfdr))
+            #endif // _WIN32
+
         {
             if(!interruptor->restore())
             {
@@ -950,8 +961,8 @@ int MySocket::Bind(char *localAddr, char *localPort)
     }
 //linux本地socket
     m_sockLocalPath.sun_family = m_domain;
-    strncpy(&m_sockLocalPath.sun_path[1],localAddr,sizeof(srv_addr.sun_path)-2);
-    m_sockLocalPath[0] = 0;
+    strncpy(&m_sockLocalPath.sun_path[1],localAddr,sizeof(m_sockLocalPath.sun_path)-2);
+    m_sockLocalPath.sun_path[0] = 0;
     addr_len = ((char *)m_sockLocalPath.sun_path) - ((char*)&m_sockLocalPath) + strlen(localAddr);
 
     if(bind(m_socket,(struct sockaddr*)&m_sockLocalPath,addr_len)==SockError)
@@ -1016,7 +1027,7 @@ int  MySocket::Accept(MySocket *&newrs)
     {
         goto normal;
     }
-    addr = sizeof(m_sockLocalClientPath);
+    //addr = sizeof(m_sockLocalClientPath);
     while((newsocket = Accept((sockaddr *)&m_sockLocalClientPath,&addrlen)) < 0)
     {
         if(errno != EINTR) break;
@@ -1024,7 +1035,7 @@ int  MySocket::Accept(MySocket *&newrs)
     if(newsocket>=0){
 		newrs = new MySocket;
 		newrs->SetSocket(newsocket);
-		newrs->setDestAddrPath(&m_sockLocalClientPath);
+		newrs->SetDestAddrPath(&m_sockLocalClientPath);
 		return OK;
 	}
 	else{
@@ -1062,14 +1073,14 @@ int  MySocket::Accept_s(MySocket *newrs)
     {
         goto normal;
     }
-    addr = sizeof(m_sockLocalClientPath);
+    //addr = sizeof(m_sockLocalClientPath);
     while((newsocket = Accept((sockaddr *)&m_sockLocalClientPath,&addrlen)) < 0)
     {
         if(errno != EINTR) break;
     }
     if(newsocket>=0){
 		newrs->SetSocket(newsocket);
-		newrs->setDestAddrPath(&m_sockLocalClientPath);
+		newrs->SetDestAddrPath(&m_sockLocalClientPath);
 		return OK;
 	}
 	else{

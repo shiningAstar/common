@@ -269,7 +269,7 @@ public:
     }
     bool findValue(char *key, int key_len)
     {
-        typename map<keytype, valuetype>::iterator iter;
+        typename map<string, valuetype>::iterator iter;
         if(!corr_string(key, key_len) || _map == NULL)
         {
             return false;
@@ -457,7 +457,7 @@ public:
     }
     bool findValue(keytype key)
     {
-        typename map<keytype, valuetype>::iterator iter;
+        typename map<keytype, string>::iterator iter;
         if(_map == NULL)
         {
             return false;
@@ -653,7 +653,7 @@ public:
     }
     bool findValue(char *key, int key_len)
     {
-        typename map<keytype, valuetype>::iterator iter;
+         map<string, string>::iterator iter;
         if(!corr_string(key, key_len) || _map == NULL)
         {
             return false;

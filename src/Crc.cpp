@@ -1,5 +1,5 @@
 
-#include "crc.h"
+#include "Crc.h"
 #include "string.h"
 
 const unsigned char crc16_1[] = {

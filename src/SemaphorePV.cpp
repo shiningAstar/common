@@ -258,8 +258,14 @@ SemaphoreOutProcessPV::SemaphoreOutProcessPV()
 
 }
 
-SemaphoreOutProcessPV::SemaphoreOutProcessPV(char *name, int open_flag, int value):SemaphoreOutProcessPV()
+SemaphoreOutProcessPV::SemaphoreOutProcessPV(char *name, int open_flag, int value)
+#ifdef _WIN32:SemaphoreOutProcessPV() 
 {
+#else
+{	
+ memset(this->name, 0, sizeof(name));
+    psem = NULL;
+#endif
 
     init(name, open_flag, value);
 }

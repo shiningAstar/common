@@ -58,8 +58,15 @@ SharedMemory::~SharedMemory()
 #endif
 }
 
-SharedMemory::SharedMemory(char *name, size_t size): SharedMemory()
+SharedMemory::SharedMemory(char *name, size_t size)
+#ifdef _WIN32 
+:SharedMemory()
 {
+#else
+: size(0), mem_ptr(NULL)
+{
+ memset(name, 0, sizeof(name));
+#endif
     init(name, size);
 }
 

@@ -21,7 +21,9 @@ public:
     virtual int getValue() = 0;
     #endif // _WIN32
     virtual bool V() = 0;
+     #ifdef _WIN32
     virtual bool V(int res_count) = 0;
+	#endif
     virtual bool available() = 0;
     virtual int getErrno() = 0;
 };

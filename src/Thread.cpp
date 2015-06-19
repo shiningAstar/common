@@ -44,7 +44,7 @@ bool Thread::waittoStop(void **ret)
     void *pr;
     //if(status == STOPPING)
         //return true;
-    if(!pthread_join(tid, &pr))
+    if(pthread_join(tid, &pr))
     {
         return false;
     }
