@@ -26,8 +26,8 @@ class BlockingInterruptor
     protected:
 
         #ifdef _WIN32
-        MySocket sock_in;
-        MySocket server;
+		MySocket server;
+        MySocket sock_in;        
         MySocket sock_out;
         #else
         int fdctr[2];

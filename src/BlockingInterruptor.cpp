@@ -84,7 +84,11 @@ bool BlockingInterruptor::init()
     }
     server.Close();
     #else
-    pipe(fdctr);
+    if(pipe(fdctr) < 0)
+	{
+		printf("blocking interruptor pipe failed.\n");
+		return false;
+	}
     #endif // _WIN32
     avail = true;
     #ifdef _WIN32
@@ -96,10 +100,7 @@ bool BlockingInterruptor::init()
 }
 
 
-int *BlockingInterruptor::getFdctr()
-{
-    return fdctr;
-}
+
 #ifdef _WIN32
 MySocket *BlockingInterruptor::getSockIn()
 {
@@ -109,6 +110,11 @@ MySocket *BlockingInterruptor::getSockOut()
 {
     return &sock_out;
 }
+#else
+int *BlockingInterruptor::getFdctr()
+{
+    return fdctr;
+}
 #endif // _WIN32
 bool BlockingInterruptor::available()
 {
@@ -117,22 +123,21 @@ bool BlockingInterruptor::available()
 
 bool BlockingInterruptor::interrupt()
 {
-
+	char c = 0;
     if(!avail)
     {
         return false;
     }
     #ifdef _WIN32
-    char c = 0;
     if(sock_in.Writen(&c, 1, 1000) != 1)
     {
         return false;
     }
     #else
-    int length;
-    if((length = write(fdctr[1],"interrupt",9))!=9)
+    if(write(fdctr[1], &c, 1) != 1)
     {
         printf("pipe write error!\n");
+		return false;
     }
     #endif // _WIN32
 
@@ -141,13 +146,12 @@ bool BlockingInterruptor::interrupt()
 
 bool BlockingInterruptor::restore()
 {
-
+	char c;
     if(!avail)
     {
         return false;
     }
     #ifdef _WIN32
-    char c;
     if(sock_out.Readn(&c, 1, 1000) != 1)
     {
         return false;
@@ -157,13 +161,16 @@ bool BlockingInterruptor::restore()
         return false;
     }
     #else
-    char ptr[10];
-    int length;
 
-    if(( length = read(fdctr[0],ptr,9)) !=9)
+    if(( length = read(fdctr[0], &c, 1)) != 1)
     {
         printf("pipe read error!\n");
+		return false;
     }
+	if(c != 0)
+	{
+		return false;
+	}
     #endif
 
     return true;

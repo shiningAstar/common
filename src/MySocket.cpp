@@ -526,8 +526,8 @@ int MySocket::SelectWaitInterruptable(BlockingInterruptor *interruptor, long SEv
 		#ifdef _WIN32
 		FD_SET(interruptor->getSockOut()->GetSocket(), &fdr);
 		#else
-		int *fdctr = interruptor->getFdctr();
-		FD_SET(fdctr[0], &fdr);
+		//int *fdctr = interruptor->getFdctr();
+		FD_SET(interruptor->getFdctr()[0], &fdr);
 		#endif
 	}
 	if(SEvent & FD_WRITE){
@@ -540,8 +540,8 @@ int MySocket::SelectWaitInterruptable(BlockingInterruptor *interruptor, long SEv
             #ifdef _WIN32
             if(FD_ISSET(interruptor->getSockOut()->GetSocket(), pfdr))
             #else
-            int *fdctl = interruptor->getFdctr();
-            if(FD_ISSET(fdctl[0],pfdr))
+            //int *fdctl = interruptor->getFdctr();
+            if(interruptor->getFdctr()[0], pfdr))
             #endif // _WIN32
 
         {
