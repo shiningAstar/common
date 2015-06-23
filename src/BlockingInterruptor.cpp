@@ -162,7 +162,7 @@ bool BlockingInterruptor::restore()
     }
     #else
 
-    if(( length = read(fdctr[0], &c, 1)) != 1)
+    if( read(fdctr[0], &c, 1)!= 1)
     {
         printf("pipe read error!\n");
 		return false;
