@@ -289,7 +289,7 @@ int MySocket::Connect(char* destAddr,char* destPort)
 #endif // _WIN32
 //网络socket
 normal:
-    printf("%s:%s\n", destAddr, destPort);
+    //printf("%s:%s\n", destAddr, destPort);
 	memset(&sin,0,sizeof(sin));
 	sin.sin_family = AF_INET;
 	if ((sin.sin_port = htons((u_short)atoi(destPort)))==0)
@@ -329,10 +329,10 @@ normal:
 			getsockname(m_socket,&m_sockLocal,&namelen);
 		}
 	}
-	for(int i = 0; i < 16; i++)
-    {
-        printf("%02x ", ((unsigned char *)&m_sockDest)[i]);
-    }
+	//for(int i = 0; i < 16; i++)
+    //{
+        //printf("%02x ", ((unsigned char *)&m_sockDest)[i]);
+    //}
 	if(connect(m_socket, (struct sockaddr*)&m_sockDest, sizeof(m_sockDest))==SockError)
 	{
 		close(m_socket);
@@ -340,7 +340,7 @@ normal:
 		return FAIL;
 	}
     ObtainLocalAddr();
-    printf("connected.\n");
+    //printf("connected.\n");
     return OK;
 
 }
@@ -531,7 +531,7 @@ int MySocket::SelectWaitInterruptable(BlockingInterruptor *interruptor, long SEv
 		#else
 		//int *fdctr = interruptor->getFdctr();
 		FD_SET(interruptor->getFdctr()[0], &fdr);
-		printf("m_socket:%d,interruptor->getFdctr()[0]:%d",m_socket,interruptor->getFdctr()[0]);
+		//printf("m_socket:%d,interruptor->getFdctr()[0]:%d",m_socket,interruptor->getFdctr()[0]);
 		#endif
 	}
 	if(SEvent & FD_WRITE){
@@ -540,7 +540,7 @@ int MySocket::SelectWaitInterruptable(BlockingInterruptor *interruptor, long SEv
 		FD_SET(m_socket, &fdw);
 	}
 	int sn=Select(pfdr,pfdw, NULL,MSec);
-	printf("select %d.\n", sn);
+	//printf("select %d.\n", sn);
 	if (sn > 0){
             #ifdef _WIN32
             if(FD_ISSET(interruptor->getSockOut()->GetSocket(), pfdr))
@@ -1228,10 +1228,10 @@ int MySocket::SetDestAddrPath(struct sockaddr_un* destAddr)
 int MySocket::ObtainLocalAddr()
 {
 	socklen_t namelen=sizeof(m_sockLocal);
-//	if(getsockname(m_socket,&m_sockLocal,&namelen) < 0)
-//		return ERROR;
-//	else
-//		return OK;
+	if(getsockname(m_socket,&m_sockLocal,&namelen) < 0)
+		return ERROR;
+	else
+		return OK;
 }
 
 int MySocket::SetLocalAddr(struct sockaddr* localAddr)
