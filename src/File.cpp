@@ -153,13 +153,13 @@ bool File::open(char* path, char* name, int flag, int right, int shared)
         shared = 0x07;
     }
     fd = CreateFileA(
-        fullname,    // Ö¸ÏòÎÄ¼şÃûµÄÖ¸Õë
-        access,    // ·ÃÎÊÄ£Ê½£¨Ğ´ / ¶Á£©
-        (DWORD)shared,    // ¹²ÏíÄ£Ê½
-        NULL, // Ö¸Ïò°²È«ÊôĞÔµÄÖ¸Õë
-        create,   // ÈçºÎ´´½¨
-        0,   // ÎÄ¼şÊôĞÔ
-        0    // ÓÃÓÚ¸´ÖÆÎÄ¼ş¾ä±ú
+        fullname,    // æŒ‡å‘æ–‡ä»¶åçš„æŒ‡é’ˆ
+        access,    // è®¿é—®æ¨¡å¼ï¼ˆå†™ / è¯»ï¼‰
+        (DWORD)shared,    // å…±äº«æ¨¡å¼
+        NULL, // æŒ‡å‘å®‰å…¨å±æ€§çš„æŒ‡é’ˆ
+        create,   // å¦‚ä½•åˆ›å»º
+        0,   // æ–‡ä»¶å±æ€§
+        0    // ç”¨äºå¤åˆ¶æ–‡ä»¶å¥æŸ„
         );
     if(fd == INVALID_HANDLE_VALUE)
     {
@@ -216,11 +216,11 @@ int File::writenBytes(const char* buffer, int n)
 		}
 #else
         ret = WriteFile(
-            fd,//ÎÄ¼ş¾ä±ú
-            p,//Êı¾İ»º´æÇøÖ¸Õë
-            n,//ÄãÒªĞ´µÄ×Ö½ÚÊı
-            (PDWORD)&writeBytes,//ÓÃÓÚ±£´æÊµ¼ÊĞ´Èë×Ö½ÚÊıµÄ´æ´¢ÇøÓòµÄÖ¸Õë
-            NULL //OVERLAPPED½á¹¹ÌåÖ¸Õë
+            fd,//æ–‡ä»¶å¥æŸ„
+            p,//æ•°æ®ç¼“å­˜åŒºæŒ‡é’ˆ
+            n,//ä½ è¦å†™çš„å­—èŠ‚æ•°
+            (PDWORD)&writeBytes,//ç”¨äºä¿å­˜å®é™…å†™å…¥å­—èŠ‚æ•°çš„å­˜å‚¨åŒºåŸŸçš„æŒ‡é’ˆ
+            NULL //OVERLAPPEDç»“æ„ä½“æŒ‡é’ˆ
         );
         if(writeBytes < 0 || ret == false)
 		{
@@ -271,13 +271,13 @@ int File::readnBytes(char* buffer, int n)
 		}
 #else
         ret = ReadFile(
-            fd,                                    //ÎÄ¼şµÄ¾ä±ú
-            p,                                //ÓÃÓÚ±£´æ¶ÁÈëÊı¾İµÄÒ»¸ö»º³åÇø
-            n,    //Òª¶ÁÈëµÄ×Ö½ÚÊı
-            (PDWORD)&readBytes,    //Ö¸ÏòÊµ¼Ê¶ÁÈ¡×Ö½ÚÊıµÄÖ¸Õë
+            fd,                                    //æ–‡ä»¶çš„å¥æŸ„
+            p,                                //ç”¨äºä¿å­˜è¯»å…¥æ•°æ®çš„ä¸€ä¸ªç¼“å†²åŒº
+            n,    //è¦è¯»å…¥çš„å­—èŠ‚æ•°
+            (PDWORD)&readBytes,    //æŒ‡å‘å®é™…è¯»å–å­—èŠ‚æ•°çš„æŒ‡é’ˆ
             NULL
-                //ÈçÎÄ¼ş´ò¿ªÊ±Ö¸¶¨ÁËFILE_FLAG_OVERLAPPED£¬ÄÇÃ´±ØĞë£¬ÓÃÕâ¸ö²ÎÊıÒıÓÃÒ»¸öÌØÊâµÄ½á¹¹¡£
-                //¸Ã½á¹¹¶¨ÒåÁËÒ»´ÎÒì²½¶ÁÈ¡²Ù×÷¡£·ñÔò£¬Ó¦½«Õâ¸ö²ÎÊıÉèÎªNULL
+                //å¦‚æ–‡ä»¶æ‰“å¼€æ—¶æŒ‡å®šäº†FILE_FLAG_OVERLAPPEDï¼Œé‚£ä¹ˆå¿…é¡»ï¼Œç”¨è¿™ä¸ªå‚æ•°å¼•ç”¨ä¸€ä¸ªç‰¹æ®Šçš„ç»“æ„ã€‚
+                //è¯¥ç»“æ„å®šä¹‰äº†ä¸€æ¬¡å¼‚æ­¥è¯»å–æ“ä½œã€‚å¦åˆ™ï¼Œåº”å°†è¿™ä¸ªå‚æ•°è®¾ä¸ºNULL
         );
         if(readBytes < 0 || ret == false)
         {
@@ -465,7 +465,7 @@ bool File::close()
     if(fd != (HANDLE)0xffffffff)
     {
         CloseHandle(fd);
-        printf("close file :%d. \n", (int)fd);
+        //printf("close file :%d. \n", (int)fd);
         fd = (HANDLE)0xffffffff;
         return true;
     }

@@ -1,7 +1,9 @@
 #include "BlockingInterruptor.h"
 #include "Thread.h"
 #include "time.h"
+#ifndef _WIN32
 #include "unistd.h"
+#endif // _WIN32
 BlockingInterruptor::BlockingInterruptor() : avail(false)
 {
     //ctor

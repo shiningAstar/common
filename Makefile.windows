@@ -19,7 +19,7 @@ obj_files_debug = $(foreach file, $(objects_debug),$(dir_obj_debug)\$(file))
 
 h_export = logBase.h logFile.h logTerminal.h File.h ControlwithLog.h logControl.h log.h MySocket.h MutexLock.h \
 			ConfigBase.h FileConfig.h SemaphorePV.h Thread.h Error.h SharedMemory.h base.h Crc.h BlockingInterruptor.h \
-			FuncPtrMap.h NorMap.h
+			FuncPtrMap.h NorMap.h List.h
 
 h_export_file = $(foreach file, $(h_export), include\$(file))
 
@@ -40,7 +40,7 @@ flags_debug = -Wl,--output-def=$(target_lib_defname_debug) \
    -Wl,--out-implib=$(target_lib_impname_debug) -Wl,--dll
 
 ReleaseCompile : ReleaseDir $(objects_release)
-	$(compile_lib) $(flags_release) $(obj_files_release) -o $(target_lib_name_release) -s -lws2_32 -lwsock32 -lpthread
+	$(compile_lib) $(flags_release) $(obj_files_release) -o $(target_lib_name_release) -s -lws2_32 -lwsock32 -lpthread -ladvapi32
 
 Release : ReleaseCompile
 	if not exist ..\create\include md ..\create\include
@@ -49,7 +49,7 @@ Release : ReleaseCompile
 	copy bin\release\*.* ..\create\bin\release
 
 DebugCompile : DebugDir $(objects_debug)
-	$(compile_lib) $(flags_debug) $(obj_files_debug) -o $(target_lib_name_debug) -lws2_32 -lwsock32 -lpthread
+	$(compile_lib) $(flags_debug) $(obj_files_debug) -o $(target_lib_name_debug) -lws2_32 -lwsock32 -lpthread -ladvapi32
 
 Debug : DebugCompile
 	if not exist ..\create\include md ..\create\include
