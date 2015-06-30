@@ -456,7 +456,7 @@ bool File::close()
 	if(fd >= 0)
 	{
 		::close(fd);
-		//printf("close file :%d. \n", fd);
+		printf("close file :%d. \n", fd);
 		fd = -1;
 		return true;
 	}
@@ -465,7 +465,7 @@ bool File::close()
     if(fd != (HANDLE)0xffffffff)
     {
         CloseHandle(fd);
-        //printf("close file :%d. \n", (int)fd);
+        printf("close file :%d. \n", (int)fd);
         fd = (HANDLE)0xffffffff;
         return true;
     }

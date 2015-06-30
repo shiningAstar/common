@@ -10,6 +10,10 @@
 	#include "poll.h"
 #endif*/
 
+#ifndef _DEBUG
+#define _DEBUG
+#endif // DEBUG 用于debug输出
+
 #include "../include/MySocket.h"
 
 #include "BlockingInterruptor.h"
@@ -158,7 +162,10 @@ void MySocket::Close()
 	CloseMulticast();
 	if(m_socket != SockInvalid )
 	{
-		close(m_socket);
+	    close(m_socket);
+	    #ifdef _DEBUG
+		printf("close socket fd:%d\n",m_socket);
+		#endif // _DEBUG
 	}
 	m_socket = SockInvalid;
 	m_nSocketType = SOCK_STREAM;
@@ -281,6 +288,9 @@ int MySocket::Connect(char* destAddr,char* destPort)
     if(connect(m_socket, (struct sockaddr*)&m_sockLocalPath, addr_len)==SockError)
 	{
 		close(m_socket);
+	    #ifdef _DEBUG
+		printf("close socket fd:%d\n",m_socket);
+		#endif // _DEBUG
 		m_socket = SockInvalid;
 	}
 
@@ -321,6 +331,9 @@ normal:
 		if(bind(m_socket,(struct sockaddr*)&sin,sizeof(sin))==SockError)
 		{
 			close(m_socket);
+            #ifdef _DEBUG
+            printf("close socket fd:%d\n",m_socket);
+            #endif // _DEBUG
 			m_socket = SockInvalid;
 		}
 		else
@@ -336,6 +349,9 @@ normal:
 	if(connect(m_socket, (struct sockaddr*)&m_sockDest, sizeof(m_sockDest))==SockError)
 	{
 		close(m_socket);
+	    #ifdef _DEBUG
+		printf("close socket fd:%d\n",m_socket);
+		#endif // _DEBUG
 		m_socket = SockInvalid;
 		return FAIL;
 	}
@@ -382,6 +398,9 @@ int MySocket::Connect(char* destAddr,int destPort,long MSec)
 		if(ret<=0){
 	    	SetNonBlockMode(0);
 			close(m_socket);
+            #ifdef _DEBUG
+            printf("close socket fd:%d\n",m_socket);
+            #endif // _DEBUG
 			m_socket = SockInvalid;
 			return TIMEOUT;
 		}
@@ -389,6 +408,9 @@ int MySocket::Connect(char* destAddr,int destPort,long MSec)
 			if(FD_ISSET(m_socket,&fdr) || !FD_ISSET(m_socket,&fdw)){
 				SetNonBlockMode(0);
 				close(m_socket);
+                #ifdef _DEBUG
+                printf("close socket fd:%d\n",m_socket);
+                #endif // _DEBUG
 				m_socket = SockInvalid;
 				return FAIL;
 			}
@@ -434,6 +456,9 @@ normal:
 		if(bind(m_socket,(struct sockaddr*)&sin,sizeof(sin))==SockError)
 		{
 			close(m_socket);
+            #ifdef _DEBUG
+            printf("close socket fd:%d\n",m_socket);
+            #endif // _DEBUG
 			m_socket = SockInvalid;
 		}
 		else
@@ -454,6 +479,9 @@ normal:
 		if(ret<=0){
 	    	SetNonBlockMode(0);
 			close(m_socket);
+            #ifdef _DEBUG
+            printf("close socket fd:%d\n",m_socket);
+            #endif // _DEBUG
 			m_socket = SockInvalid;
 			return TIMEOUT;
 		}
@@ -461,6 +489,9 @@ normal:
 			if(FD_ISSET(m_socket,&fdr) || !FD_ISSET(m_socket,&fdw)){
 				SetNonBlockMode(0);
 				close(m_socket);
+                #ifdef _DEBUG
+                printf("close socket fd:%d\n",m_socket);
+                #endif // _DEBUG
 				m_socket = SockInvalid;
 				return FAIL;
 			}
