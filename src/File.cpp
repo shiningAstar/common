@@ -14,6 +14,8 @@
 #include "sys/stat.h"
 #include "unistd.h"
 
+#define _DEBUG_
+
 //#include "linuxh.h"
 File::File()
 {
@@ -456,7 +458,9 @@ bool File::close()
 	if(fd >= 0)
 	{
 		::close(fd);
+		#ifdef _DEBUG_
 		printf("close file :%d. \n", fd);
+		#endif
 		fd = -1;
 		return true;
 	}
@@ -465,7 +469,9 @@ bool File::close()
     if(fd != (HANDLE)0xffffffff)
     {
         CloseHandle(fd);
+		#ifdef _DEBUG
         printf("close file :%d. \n", (int)fd);
+		#endif
         fd = (HANDLE)0xffffffff;
         return true;
     }

@@ -10,8 +10,8 @@
 	#include "poll.h"
 #endif*/
 
-#ifndef _DEBUG
-#define _DEBUG
+#ifndef _DEBUG_
+#define _DEBUG_
 #endif // DEBUG 用于debug输出
 
 #include "../include/MySocket.h"
@@ -163,12 +163,13 @@ void MySocket::Close()
 	if(m_socket != SockInvalid )
 	{
 	    close(m_socket);
-	    #ifdef _DEBUG
+	    #ifdef _DEBUG_
 		printf("close socket fd:%d\n",m_socket);
-		#endif // _DEBUG
+		#endif // _DEBUG_
+		m_socket = SockInvalid;
 	}
-	m_socket = SockInvalid;
-	m_nSocketType = SOCK_STREAM;
+	
+	//m_nSocketType = SOCK_STREAM;
 	Initialize();
 }
 
@@ -287,13 +288,8 @@ int MySocket::Connect(char* destAddr,char* destPort)
 
     if(connect(m_socket, (struct sockaddr*)&m_sockLocalPath, addr_len)==SockError)
 	{
-		close(m_socket);
-	    #ifdef _DEBUG
-		printf("close socket fd:%d\n",m_socket);
-		#endif // _DEBUG
-		m_socket = SockInvalid;
+		Close();
 	}
-
 	return OK;
 
 #endif // _WIN32
@@ -330,11 +326,7 @@ normal:
 		SetSockOpt((int)SOL_SOCKET,SO_REUSEADDR,(char*)&share,sizeof(share));
 		if(bind(m_socket,(struct sockaddr*)&sin,sizeof(sin))==SockError)
 		{
-			close(m_socket);
-            #ifdef _DEBUG
-            printf("close socket fd:%d\n",m_socket);
-            #endif // _DEBUG
-			m_socket = SockInvalid;
+			Close();
 		}
 		else
 		{
@@ -348,11 +340,7 @@ normal:
     //}
 	if(connect(m_socket, (struct sockaddr*)&m_sockDest, sizeof(m_sockDest))==SockError)
 	{
-		close(m_socket);
-	    #ifdef _DEBUG
-		printf("close socket fd:%d\n",m_socket);
-		#endif // _DEBUG
-		m_socket = SockInvalid;
+		Close();
 		return FAIL;
 	}
     ObtainLocalAddr();
@@ -397,21 +385,13 @@ int MySocket::Connect(char* destAddr,int destPort,long MSec)
 		ret = Select(&fdr,&fdw,NULL,MSec);
 		if(ret<=0){
 	    	SetNonBlockMode(0);
-			close(m_socket);
-            #ifdef _DEBUG
-            printf("close socket fd:%d\n",m_socket);
-            #endif // _DEBUG
-			m_socket = SockInvalid;
+			Close();
 			return TIMEOUT;
 		}
 		else{
 			if(FD_ISSET(m_socket,&fdr) || !FD_ISSET(m_socket,&fdw)){
 				SetNonBlockMode(0);
-				close(m_socket);
-                #ifdef _DEBUG
-                printf("close socket fd:%d\n",m_socket);
-                #endif // _DEBUG
-				m_socket = SockInvalid;
+				Close();
 				return FAIL;
 			}
 		}
@@ -455,11 +435,7 @@ normal:
 		SetSockOpt((int)SOL_SOCKET,SO_REUSEADDR,(char*)&share,sizeof(share));
 		if(bind(m_socket,(struct sockaddr*)&sin,sizeof(sin))==SockError)
 		{
-			close(m_socket);
-            #ifdef _DEBUG
-            printf("close socket fd:%d\n",m_socket);
-            #endif // _DEBUG
-			m_socket = SockInvalid;
+			Close();
 		}
 		else
 		{
@@ -478,21 +454,13 @@ normal:
 		ret = Select(&fdr,&fdw,NULL,MSec);
 		if(ret<=0){
 	    	SetNonBlockMode(0);
-			close(m_socket);
-            #ifdef _DEBUG
-            printf("close socket fd:%d\n",m_socket);
-            #endif // _DEBUG
-			m_socket = SockInvalid;
+			Close();
 			return TIMEOUT;
 		}
 		else{
 			if(FD_ISSET(m_socket,&fdr) || !FD_ISSET(m_socket,&fdw)){
 				SetNonBlockMode(0);
-				close(m_socket);
-                #ifdef _DEBUG
-                printf("close socket fd:%d\n",m_socket);
-                #endif // _DEBUG
-				m_socket = SockInvalid;
+				Close();
 				return FAIL;
 			}
 		}
