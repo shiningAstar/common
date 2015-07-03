@@ -20,7 +20,7 @@ obj_files_debug = $(foreach file, $(objects_debug),$(dir_obj_debug)/$(file))
 
 h_export = logBase.h logFile.h logTerminal.h File.h ControlwithLog.h logControl.h log.h MySocket.h MutexLock.h \
 			ConfigBase.h FileConfig.h SemaphorePV.h Thread.h Error.h SharedMemory.h BlockingInterruptor.h \
-			NorMap.h List.h Crc.h base.h FuncPtrMap.h
+			NorMap.h List.h Crc.h base.h FuncPtrMap.h Que.h
 
 h_export_file = $(foreach file, $(h_export), ./include/$(file))
 
