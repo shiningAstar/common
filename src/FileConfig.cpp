@@ -107,6 +107,10 @@ bool FileConfig::loadAll()
 #define unprintable(x) x < ' ' || x > '~'
 #define trim(x,n) for(int i = n-1; i >= 0; i--) if(x[i] == ' ')x[i] = 0; else break;
             char ch = buf[i];
+            if(ch == '#')
+            {
+                break;
+            }
             switch(c)
             {
                 case 0 : //¿ªÊ¼

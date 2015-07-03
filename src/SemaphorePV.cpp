@@ -4,6 +4,7 @@
 #include "fcntl.h"
 #include "Error.h"
 #include "stdio.h"
+#include "time.h"
 #ifdef _WIN32
 int g_sema_use_global_name = 1;
 #endif // _WIN32
@@ -103,7 +104,7 @@ bool SemaphoreInProcessPV::P(long wait_sec, long wait_nsec)
     {
         return false;
     }
-    time.tv_sec = wait_sec;
+    time.tv_sec = ::time(NULL) + wait_sec;
     time.tv_nsec = wait_nsec;
 
 #ifdef _WIN32
@@ -119,8 +120,7 @@ bool SemaphoreInProcessPV::P(long wait_sec, long wait_nsec)
         return false;
     }
 #endif
-int i;
-    if((i = sem_timedwait(&sem, &time) ) < 0)
+    if(sem_timedwait(&sem, &time) < 0)
     {
         return false;
     }
@@ -259,10 +259,10 @@ SemaphoreOutProcessPV::SemaphoreOutProcessPV()
 }
 
 SemaphoreOutProcessPV::SemaphoreOutProcessPV(char *name, int open_flag, int value)
-#ifdef _WIN32:SemaphoreOutProcessPV() 
+#ifdef _WIN32:SemaphoreOutProcessPV()
 {
 #else
-{	
+{
  memset(this->name, 0, sizeof(name));
     psem = NULL;
 #endif

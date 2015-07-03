@@ -210,10 +210,10 @@ private:
 
 inline void __list_add(ListHead *n, ListHead *prev, ListHead *next)
 {
-    prev->setNext(n);
-    n->setPrev(prev);
-    next->setPrev(n);
     n->setNext(next);
+    next->setPrev(n);
+    n->setPrev(prev);
+    prev->setNext(n);
 }
 inline void __list_del(ListHead *prev, ListHead *next)
 {
