@@ -3,6 +3,7 @@
 
 #include "List.h"
 #include "SemaphorePV.h"
+#include "errno.h"
 
 //队列基类
 class Que
@@ -461,7 +462,7 @@ public:
             if(errno == 10060)
                 timedout = true;
             #else
-            if(errno == ETIMEOUT)
+            if(errno == ETIMEDOUT)
                 timedout = true;
             #endif
             else
