@@ -55,6 +55,9 @@ class SemaphoreInProcessPV : SemaphoreBase
         int getErrno();
     protected:
         sem_t sem;
+        #ifndef _WIN32
+        bool avail;
+        #endif // _WIN32
     private:
 };
 

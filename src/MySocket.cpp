@@ -165,6 +165,10 @@ void MySocket::Close()
 	    close(m_socket);
 	    #ifdef _DEBUG_
 		printf("close socket fd:%d\n",m_socket);
+		if(m_socket == -1)
+		{
+			printf("socket -1");
+		}
 		#endif // _DEBUG_
 		m_socket = SockInvalid;
 	}

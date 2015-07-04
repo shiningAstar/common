@@ -31,6 +31,7 @@ SemaphoreInProcessPV::SemaphoreInProcessPV()
     sem = NULL;
 #else
     memset(&sem, 0, sizeof(sem_t));
+    avail = false;
 #endif
 }
 
@@ -55,7 +56,6 @@ SemaphoreInProcessPV::~SemaphoreInProcessPV()
 
 bool SemaphoreInProcessPV::init(int value)
 {
-
     if(value < 0 || value > SEM_VALUE_MAX)
     {
         return false;
@@ -73,6 +73,9 @@ bool SemaphoreInProcessPV::init(int value)
 #endif
         return false;
     }
+#ifndef _WIN32
+    avail = true;
+#endif // _WIN32
     return true;
 }
 
@@ -84,9 +87,7 @@ bool SemaphoreInProcessPV::P()
         return false;
     }
 #else
-    sem_t s;
-    memset(&s, 0, sizeof(sem_t));
-    if(memcmp(&sem, &s, sizeof(sem_t)) == 0)
+    if(!avail)
     {
         return false;
     }
@@ -104,6 +105,7 @@ bool SemaphoreInProcessPV::P(long wait_sec, long wait_nsec)
     {
         return false;
     }
+    memset(&time, 0, sizeof(timespec));
     time.tv_sec = ::time(NULL) + wait_sec;
     time.tv_nsec = wait_nsec;
 
@@ -113,9 +115,7 @@ bool SemaphoreInProcessPV::P(long wait_sec, long wait_nsec)
         return false;
     }
 #else
-    sem_t s;
-    memset(&s, 0, sizeof(sem_t));
-    if(memcmp(&sem, &s, sizeof(sem_t)) == 0)
+    if(!avail)
     {
         return false;
     }
@@ -136,9 +136,7 @@ bool SemaphoreInProcessPV::tryP()
         return false;
     }
 #else
-    sem_t s;
-    memset(&s, 0, sizeof(sem_t));
-    if(memcmp(&sem, &s, sizeof(sem_t)) == 0)
+    if(!avail)
     {
         return false;
     }
@@ -160,9 +158,7 @@ bool SemaphoreInProcessPV::V()
         return false;
     }
 #else
-    sem_t s;
-    memset(&s, 0, sizeof(sem_t));
-    if(memcmp(&sem, &s, sizeof(sem_t)) == 0)
+    if(!avail)
     {
         return false;
     }
@@ -184,19 +180,10 @@ bool SemaphoreInProcessPV::V(int res_count)
         return false;
     }
 
-#ifdef _WIN32
     if(sem == NULL)
     {
         return false;
     }
-#else
-    sem_t s;
-    memset(&s, 0, sizeof(sem_t));
-    if(memcmp(&sem, &s, sizeof(sem_t)) == 0)
-    {
-        return false;
-    }
-#endif
     if(sem_post_multiple(&sem, res_count) < 0)
     {
         return false;
@@ -216,9 +203,7 @@ int SemaphoreInProcessPV::getValue()
         return false;
     }
 #else
-    sem_t s;
-    memset(&s, 0, sizeof(sem_t));
-    if(memcmp(&sem, &s, sizeof(sem_t)) == 0)
+    if(!avail)
     {
         return false;
     }
@@ -235,9 +220,7 @@ bool SemaphoreInProcessPV::available()
 #ifdef _WIN32
     return sem != NULL;
 #else
-    sem_t s;
-    memset(&s, 0, sizeof(sem_t));
-    return memcmp(&sem, &s, sizeof(sem_t)) != 0;
+    return avail;
 #endif
 }
 

@@ -3,7 +3,7 @@
 
 #include "List.h"
 #include "SemaphorePV.h"
-#include "errno.h"
+//#include "errno.h"
 
 //队列基类
 class Que

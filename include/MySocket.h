@@ -61,7 +61,7 @@ public:
 	static void SetUShort(unsigned char* Buf,unsigned short Val);
 };
 
-#define  INVALID_SOCKET  0xFFFFFFFF
+
 #define  SOCKET_ERROR    -1
 #define  FD_NONE      0x00
 #define  FD_READ  	   0x01
@@ -71,9 +71,11 @@ public:
 #define  FD_INTERRUPT  0x08
 
 #ifdef _WIN32
+    #define  INVALID_SOCKET  0xFFFFFFFF
 	typedef int socklen_t;
 #else
 	typedef  int  SOCKET;
+	#define  INVALID_SOCKET  -1
 	typedef  unsigned long  DWORD;
 	typedef  unsigned int   UINT;
 #endif
