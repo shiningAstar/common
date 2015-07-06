@@ -31,6 +31,7 @@ class SharedMemory
         #endif // _WIN32
         void *mem_ptr;
     private:
+        void valueInit();
 };
 
 #endif // SHAREDMEMORY_H

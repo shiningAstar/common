@@ -59,6 +59,7 @@ class SemaphoreInProcessPV : SemaphoreBase
         bool avail;
         #endif // _WIN32
     private:
+        void valueInit();
 };
 
 //有名信号量，在进程之间同步用
@@ -102,6 +103,7 @@ class SemaphoreOutProcessPV : SemaphoreBase
         HANDLE h_sema;
         #endif // _WIN32
     private:
+        void valueInit();
 };
 
 #endif // SEMAPORE_H

@@ -27,17 +27,12 @@ SemaphoreBase::~SemaphoreBase()
 SemaphoreInProcessPV::SemaphoreInProcessPV()
 {
     //ctor
-#ifdef _WIN32
-    sem = NULL;
-#else
-    memset(&sem, 0, sizeof(sem_t));
-    avail = false;
-#endif
+    valueInit();
 }
 
 SemaphoreInProcessPV::SemaphoreInProcessPV(int value)
 {
-    SemaphoreInProcessPV();
+    valueInit();
     init(value);
 }
 
@@ -53,6 +48,16 @@ SemaphoreInProcessPV::~SemaphoreInProcessPV()
 #define SEM_VALUE_MAX 32767
 #endif // SEM_VALUE_MAX
 #endif // _WIN32
+
+void SemaphoreInProcessPV::valueInit()
+{
+#ifdef _WIN32
+    sem = NULL;
+#else
+    memset(&sem, 0, sizeof(sem_t));
+    avail = false;
+#endif
+}
 
 bool SemaphoreInProcessPV::init(int value)
 {
@@ -232,23 +237,13 @@ int SemaphoreInProcessPV::getErrno()
 SemaphoreOutProcessPV::SemaphoreOutProcessPV()
 {
     //ctor
-    memset(this->name, 0, sizeof(name));
-    #ifndef _WIN32
-    psem = NULL;
-    #else
-    h_sema = NULL;
-    #endif // _WIN32
+    valueInit();
 
 }
 
 SemaphoreOutProcessPV::SemaphoreOutProcessPV(char *name, int open_flag, int value)
-#ifdef _WIN32:SemaphoreOutProcessPV()
 {
-#else
-{
- memset(this->name, 0, sizeof(name));
-    psem = NULL;
-#endif
+    valueInit();
 
     init(name, open_flag, value);
 }
@@ -264,6 +259,16 @@ SemaphoreOutProcessPV::~SemaphoreOutProcessPV()
     #endif // _WIN32
 
 
+}
+
+void SemaphoreOutProcessPV::valueInit()
+{
+    memset(this->name, 0, sizeof(name));
+    #ifndef _WIN32
+    psem = NULL;
+    #else
+    h_sema = NULL;
+    #endif // _WIN32
 }
 
 bool SemaphoreOutProcessPV::init(char *name, int open_flag, int value)

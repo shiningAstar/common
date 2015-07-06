@@ -27,10 +27,7 @@ void sm_use_global_name(int is_use)
 SharedMemory::SharedMemory() : size(0), mem_ptr(NULL)
 {
     //ctor
-    memset(name, 0, sizeof(name));
-#ifdef _WIN32
-    hfile = INVALID_HANDLE_VALUE;
-#endif // _WIN32
+    valueInit();
 }
 
 SharedMemory::~SharedMemory()
@@ -58,16 +55,18 @@ SharedMemory::~SharedMemory()
 #endif
 }
 
-SharedMemory::SharedMemory(char *name, size_t size)
-#ifdef _WIN32 
-:SharedMemory()
+SharedMemory::SharedMemory(char *name, size_t size) : size(size), mem_ptr(NULL)
 {
-#else
-: size(0), mem_ptr(NULL)
-{
- memset(name, 0, sizeof(name));
-#endif
+    valueInit();
     init(name, size);
+}
+
+void SharedMemory::valueInit()
+{
+    memset(name, 0, sizeof(name));
+#ifdef _WIN32
+    hfile = INVALID_HANDLE_VALUE;
+#endif // _WIN32
 }
 
 void *SharedMemory::getAddr()
