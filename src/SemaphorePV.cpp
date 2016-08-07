@@ -35,7 +35,11 @@ SemaphoreInProcessPV::SemaphoreInProcessPV()
 
 SemaphoreInProcessPV::SemaphoreInProcessPV(int value)
 {
-    SemaphoreInProcessPV();
+    #ifdef _WIN32
+        sem = NULL;
+    #else
+        memset(&sem, 0, sizeof(sem_t));
+    #endif
     init(value);
 }
 
@@ -258,9 +262,14 @@ SemaphoreOutProcessPV::SemaphoreOutProcessPV()
 
 }
 
-SemaphoreOutProcessPV::SemaphoreOutProcessPV(char *name, int open_flag, int value):SemaphoreOutProcessPV()
+SemaphoreOutProcessPV::SemaphoreOutProcessPV(char *name, int open_flag, int value)
 {
-
+    memset(this->name, 0, sizeof(name));
+    #ifndef _WIN32
+    psem = NULL;
+    #else
+    h_sema = NULL;
+    #endif // _WIN32
     init(name, open_flag, value);
 }
 

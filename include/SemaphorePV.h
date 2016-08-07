@@ -85,6 +85,7 @@ class SemaphoreOutProcessPV : SemaphoreBase
         bool V(int res_count);
         #endif // _WIN32
         #ifndef _WIN32
+        bool V(int res_count);
         int getValue();
         #endif // _WIN32
         bool available();

@@ -28,9 +28,9 @@ SharedMemory::SharedMemory() : size(0), mem_ptr(NULL)
 {
     //ctor
     memset(name, 0, sizeof(name));
-#ifdef _WIN32
-    hfile = INVALID_HANDLE_VALUE;
-#endif // _WIN32
+    #ifdef _WIN32
+        hfile = INVALID_HANDLE_VALUE;
+    #endif // _WIN32
 }
 
 SharedMemory::~SharedMemory()
@@ -58,8 +58,12 @@ SharedMemory::~SharedMemory()
 #endif
 }
 
-SharedMemory::SharedMemory(char *name, size_t size): SharedMemory()
+SharedMemory::SharedMemory(char *name, size_t size): size(0), mem_ptr(NULL)
 {
+    memset(name, 0, sizeof(name));
+    #ifdef _WIN32
+        hfile = INVALID_HANDLE_VALUE;
+    #endif // _WIN32
     init(name, size);
 }
 

@@ -267,12 +267,13 @@ int MySocket::Connect(char* destAddr,char* destPort)
         return FAIL;
     }
 #ifndef _WIN32
-
-    if(m_domain != AF_LOCAL && m_domain != AF_UNIX)
+    //TODO: fix linux local
+    /*if(m_domain != AF_LOCAL && m_domain != AF_UNIX)
     {
         goto normal;
     }
 //linux本地socket
+
     m_sockLocalPath.sun_family = m_domain;
     strncpy(&m_sockLocalPath.sun_path[1],destAddr,sizeof(srv_addr.sun_path)-2);
     m_sockLocalPath[0] = 0;
@@ -284,7 +285,7 @@ int MySocket::Connect(char* destAddr,char* destPort)
 		m_socket = SockInvalid;
 	}
 
-	return OK;
+	return OK;*/
 
 #endif // _WIN32
 //网络socket
@@ -358,7 +359,8 @@ int MySocket::Connect(char* destAddr,int destPort,long MSec)
     }
 #ifndef _WIN32
 
-    if(m_domain != AF_LOCAL && m_domain != AF_UNIX)
+    //TODO: fix linux local
+    /*if(m_domain != AF_LOCAL && m_domain != AF_UNIX)
     {
         goto normal;
     }
@@ -393,7 +395,7 @@ int MySocket::Connect(char* destAddr,int destPort,long MSec)
 	}
     SetNonBlockMode(0);
 
-	return OK;
+	return OK;*/
 
 #endif // _WIN32
 //网络socket
@@ -944,7 +946,8 @@ int MySocket::Bind(char *localAddr, char *localPort)
     }
 #ifndef _WIN32
 
-    if(m_domain != AF_LOCAL && m_domain != AF_UNIX)
+    //TODO: fix linux local
+    /*if(m_domain != AF_LOCAL && m_domain != AF_UNIX)
     {
         goto normal;
     }
@@ -959,7 +962,7 @@ int MySocket::Bind(char *localAddr, char *localPort)
 		return FAIL;
 	}
 
-	return OK;
+	return OK;*/
 #endif // _WIN32
 normal:
 	memset(&sin,0,sizeof(sin));
@@ -1012,7 +1015,8 @@ int  MySocket::Accept(MySocket *&newrs)
 	SOCKET newsocket;
 #ifndef _WIN32
 
-    if(m_domain != AF_LOCAL && m_domain != AF_UNIX)
+    //TODO: fix linux local
+    /*if(m_domain != AF_LOCAL && m_domain != AF_UNIX)
     {
         goto normal;
     }
@@ -1029,7 +1033,7 @@ int  MySocket::Accept(MySocket *&newrs)
 	}
 	else{
 		return FAIL;
-	}
+	}*/
 
 #endif // _WIN32
 normal:
@@ -1058,7 +1062,8 @@ int  MySocket::Accept_s(MySocket *newrs)
     }
 #ifndef _WIN32
 
-    if(m_domain != AF_LOCAL && m_domain != AF_UNIX)
+    //TODO: fix linux local
+    /*if(m_domain != AF_LOCAL && m_domain != AF_UNIX)
     {
         goto normal;
     }
@@ -1074,7 +1079,7 @@ int  MySocket::Accept_s(MySocket *newrs)
 	}
 	else{
 		return FAIL;
-	}
+	}*/
 
 #endif // _WIN32
 normal:
