@@ -172,7 +172,7 @@ void MySocket::Close()
 		#endif // _DEBUG_
 		m_socket = SockInvalid;
 	}
-	
+
 	//m_nSocketType = SOCK_STREAM;
 	Initialize();
 }
@@ -475,6 +475,180 @@ normal:
     return OK;
 
 
+}
+
+int MySocket::Connect(int destAddr,char* destPort)
+{
+    struct hostent pphhee,*phe;
+	char   phebuf[1024];
+	int    herr;
+    struct sockaddr_in sin;
+#ifndef _WIN32
+    int addr_len;
+#endif // _WIN32
+    if(destAddr == NULL || destPort == NULL)
+    {
+        return FAIL;
+    }
+#ifndef _WIN32
+
+    if(m_domain != AF_LOCAL && m_domain != AF_UNIX)
+    {
+        goto normal;
+    }
+//linux本地socket
+    m_sockLocalPath.sun_family = m_domain;
+    strncpy(&m_sockLocalPath.sun_path[1],destAddr,sizeof(m_sockLocalPath.sun_path)-2);
+    m_sockLocalPath.sun_path[0] = 0;
+    addr_len = ((char *)m_sockLocalPath.sun_path) - ((char*)&m_sockLocalPath) + strlen(destAddr);
+
+    if(connect(m_socket, (struct sockaddr*)&m_sockLocalPath, addr_len)==SockError)
+	{
+		Close();
+	}
+	return OK;
+
+#endif // _WIN32
+//网络socket
+normal:
+    //printf("%s:%s\n", destAddr, destPort);
+	memset(&sin,0,sizeof(sin));
+	sin.sin_family = AF_INET;
+	if ((sin.sin_port = htons((u_short)atoi(destPort)))==0)
+	{
+		return FAIL;
+	}
+	//search hostname
+//#ifdef _WIN32
+//	phe=gethostbyname(destAddr);
+//#else
+	gethostbyname_r(destAddr,&pphhee,phebuf,1024,&phe,&herr);
+//#endif
+	// phe=gethostbyname(destAddr);
+	if(phe){
+		memcpy(&sin.sin_addr, phe->h_addr, phe->h_length);
+	}
+	else if((sin.sin_addr.s_addr = htonl(destAddr))== INADDR_NONE )
+	{
+		return FAIL;
+	}
+	memcpy(&m_sockDest,&sin,sizeof(sin));
+	if(m_nSocketType==SOCK_DGRAM)
+	{
+		int share=1;
+		sin.sin_family=AF_INET;
+		sin.sin_port=0 ;
+		sin.sin_addr.s_addr=INADDR_ANY ;
+		SetSockOpt((int)SOL_SOCKET,SO_REUSEADDR,(char*)&share,sizeof(share));
+		if(bind(m_socket,(struct sockaddr*)&sin,sizeof(sin))==SockError)
+		{
+			Close();
+		}
+		else
+		{
+			socklen_t namelen=sizeof(m_sockLocal);
+			getsockname(m_socket,&m_sockLocal,&namelen);
+		}
+	}
+	//for(int i = 0; i < 16; i++)
+    //{
+        //printf("%02x ", ((unsigned char *)&m_sockDest)[i]);
+    //}
+	if(connect(m_socket, (struct sockaddr*)&m_sockDest, sizeof(m_sockDest))==SockError)
+	{
+		Close();
+		return FAIL;
+	}
+    ObtainLocalAddr();
+    //printf("connected.\n");
+    return OK;
+}
+
+int MySocket::Connect(int destAddr,int destPort)
+{
+    struct hostent pphhee,*phe;
+	char   phebuf[1024];
+	int    herr;
+    struct sockaddr_in sin;
+#ifndef _WIN32
+    int addr_len;
+#endif // _WIN32
+    if(destAddr == NULL || destPort == NULL)
+    {
+        return FAIL;
+    }
+#ifndef _WIN32
+
+    if(m_domain != AF_LOCAL && m_domain != AF_UNIX)
+    {
+        goto normal;
+    }
+//linux本地socket
+    m_sockLocalPath.sun_family = m_domain;
+    strncpy(&m_sockLocalPath.sun_path[1],destAddr,sizeof(m_sockLocalPath.sun_path)-2);
+    m_sockLocalPath.sun_path[0] = 0;
+    addr_len = ((char *)m_sockLocalPath.sun_path) - ((char*)&m_sockLocalPath) + strlen(destAddr);
+
+    if(connect(m_socket, (struct sockaddr*)&m_sockLocalPath, addr_len)==SockError)
+	{
+		Close();
+	}
+	return OK;
+
+#endif // _WIN32
+//网络socket
+normal:
+    //printf("%s:%s\n", destAddr, destPort);
+	memset(&sin,0,sizeof(sin));
+	sin.sin_family = AF_INET;
+	if ((sin.sin_port = htons(destPort))==0)
+	{
+		return FAIL;
+	}
+	//search hostname
+//#ifdef _WIN32
+//	phe=gethostbyname(destAddr);
+//#else
+	gethostbyname_r(destAddr,&pphhee,phebuf,1024,&phe,&herr);
+//#endif
+	// phe=gethostbyname(destAddr);
+	if(phe){
+		memcpy(&sin.sin_addr, phe->h_addr, phe->h_length);
+	}
+	else if((sin.sin_addr.s_addr = htonl(destAddr))== INADDR_NONE )
+	{
+		return FAIL;
+	}
+	memcpy(&m_sockDest,&sin,sizeof(sin));
+	if(m_nSocketType==SOCK_DGRAM)
+	{
+		int share=1;
+		sin.sin_family=AF_INET;
+		sin.sin_port=0 ;
+		sin.sin_addr.s_addr=INADDR_ANY ;
+		SetSockOpt((int)SOL_SOCKET,SO_REUSEADDR,(char*)&share,sizeof(share));
+		if(bind(m_socket,(struct sockaddr*)&sin,sizeof(sin))==SockError)
+		{
+			Close();
+		}
+		else
+		{
+			socklen_t namelen=sizeof(m_sockLocal);
+			getsockname(m_socket,&m_sockLocal,&namelen);
+		}
+	}
+	//for(int i = 0; i < 16; i++)
+    //{
+        //printf("%02x ", ((unsigned char *)&m_sockDest)[i]);
+    //}
+	if(connect(m_socket, (struct sockaddr*)&m_sockDest, sizeof(m_sockDest))==SockError)
+	{
+		Close();
+		return FAIL;
+	}
+    ObtainLocalAddr();
+    //printf("connected.\n");
+    return OK;
 }
 
 int MySocket::SelectWait(long SEvent,long MSec)

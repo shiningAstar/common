@@ -247,11 +247,13 @@ class SequentListQue : Que
                 return false;
             }
             memcpy((char *)&sequentTable[tail], data, len);
-            tail++;
-            if(tail == capacity)
+            len = tail;
+            len++;
+            if(len == capacity)
             {
-                tail = 0;
+                len = 0;
             }
+            tail = len;
             return true;
         }
         bool push(type *data)
@@ -282,11 +284,13 @@ class SequentListQue : Que
                 return false;
             }
             memcpy(data, (char *)&sequentTable[head], len);
-            head++;
-            if(head == capacity)
+            len = head;
+            len++;
+            if(len == capacity)
             {
-                head = 0;
+                len = 0;
             }
+            head = len;
             return true;
         }
         bool pop(type *data)
@@ -325,6 +329,42 @@ class SequentListQue : Que
             memcpy(data, (char *)&sequentTable[i], len);
             return true;
         }
+        type *getTail()
+        {
+            int i;
+            if(!Que::getTail(data, length))
+            {
+                return NULL;
+            }
+            if(capacity < 2 || sequentTable == NULL)
+            {
+                return NULL;
+            }
+            if(head < 0 || head >= capacity || tail < 0 || tail >= capacity)
+            {
+                return NULL;
+            }
+            if(isFull())
+            {
+                return NULL;
+            }
+            i = (tail + capacity - 1) % capacity;
+            return &sequentTable[i];
+        }
+        bool pushed()
+        {
+            int tmp;
+            if(tail < 0 || tail >= capacity)
+                return false;
+            tmp = tail;
+            tmp++;
+            if(tmp == capacity)
+            {
+                tmp = 0;
+            }
+            tail = tmp;
+            return true;
+        }
         bool getHead(char *data, unsigned int &length)
         {
             unsigned int len = sizeof(type);
@@ -349,6 +389,40 @@ class SequentListQue : Que
                 return false;
             }
             memcpy(data, (char *)&sequentTable[head], len);
+            return true;
+        }
+        type *getHead()
+        {
+            if(!Que::getHead(data, length))
+            {
+                return NULL;
+            }
+            if(capacity < 2 || sequentTable == NULL)
+            {
+                return NULL;
+            }
+            if(head < 0 || head >= capacity || tail < 0 || tail >= capacity)
+            {
+                return NULL;
+            }
+            if(isEmpty())
+            {
+                return NULL;
+            }
+            return &sequentTable[head];
+        }
+        bool poped()
+        {
+            int tmp;
+            if(head < 0 || head >= capacity)
+                return false;
+            tmp = head;
+            tmp++;
+            if(tmp == capacity)
+            {
+                tmp = 0;
+            }
+            head = tmp;
             return true;
         }
         bool getQueItem(int index, char *data, unsigned int &length)
@@ -397,6 +471,7 @@ class SequentListQue : Que
             }
             return true;
         }
+        bool clear() {tail = head;}
     protected:
         int capacity;
         type *sequentTable;
