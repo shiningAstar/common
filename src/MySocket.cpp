@@ -258,16 +258,9 @@ int MySocket::SetMulticastLoop(unsigned char Loop)
 	return SetSockOpt(IPPROTO_IP,IP_MULTICAST_LOOP,(char*)&Loop,sizeof(Loop));
 }
 
-int MySocket::Connect(char* destAddr,int destPort)
-{
-	char Port[10];
-	sprintf(Port,"%d",destPort);
-	return Connect(destAddr,Port);
-}
-
 int MySocket::Connect(char* destAddr,char* destPort)
 {
-	struct hostent pphhee,*phe;
+	/*struct hostent pphhee,*phe;
 	char   phebuf[1024];
 	int    herr;
     struct sockaddr_in sin;
@@ -349,8 +342,15 @@ normal:
 	}
     ObtainLocalAddr();
     //printf("connected.\n");
-    return OK;
+    return OK;*/
+    return Connect(atoi(destAddr), atoi(destPort));
+}
 
+int MySocket::Connect(char* destAddr,int destPort)
+{
+	//char Port[10];
+	//sprintf(Port,"%d",destPort);
+	return Connect(atoi(destAddr),destPort);
 }
 
 int MySocket::Connect(char* destAddr,int destPort,long MSec)
@@ -479,7 +479,7 @@ normal:
 
 int MySocket::Connect(int destAddr,char* destPort)
 {
-    struct hostent pphhee,*phe;
+    /*struct hostent pphhee,*phe;
 	char   phebuf[1024];
 	int    herr;
     struct sockaddr_in sin;
@@ -519,11 +519,11 @@ normal:
 		return FAIL;
 	}
 	//search hostname
-//#ifdef _WIN32
-//	phe=gethostbyname(destAddr);
-//#else
+#ifdef _WIN32
+	phe=gethostbyname(destAddr);
+#else
 	gethostbyname_r(destAddr,&pphhee,phebuf,1024,&phe,&herr);
-//#endif
+#endif
 	// phe=gethostbyname(destAddr);
 	if(phe){
 		memcpy(&sin.sin_addr, phe->h_addr, phe->h_length);
@@ -561,10 +561,11 @@ normal:
 	}
     ObtainLocalAddr();
     //printf("connected.\n");
-    return OK;
+    return OK;*/
+    return Connect(destAddr, atoi(destPort));
 }
 
-int MySocket::Connect(int destAddr,int destPort)
+int MySocket::Connect(unsigned int destAddr, unsigned int destPort)
 {
     struct hostent pphhee,*phe;
 	char   phebuf[1024];
@@ -609,16 +610,17 @@ normal:
 //#ifdef _WIN32
 //	phe=gethostbyname(destAddr);
 //#else
-	gethostbyname_r(destAddr,&pphhee,phebuf,1024,&phe,&herr);
+	//gethostbyname_r(destAddr,&pphhee,phebuf,1024,&phe,&herr);
 //#endif
 	// phe=gethostbyname(destAddr);
-	if(phe){
-		memcpy(&sin.sin_addr, phe->h_addr, phe->h_length);
-	}
-	else if((sin.sin_addr.s_addr = htonl(destAddr))== INADDR_NONE )
-	{
-		return FAIL;
-	}
+	//if(phe){
+		//memcpy(&sin.sin_addr, phe->h_addr, phe->h_length);
+	//}
+	//else if((sin.sin_addr.s_addr = htonl(destAddr))== INADDR_NONE )
+	//{
+	//	return FAIL;
+	//}
+	sin.sin_addr.s_addr = destAddr;
 	memcpy(&m_sockDest,&sin,sizeof(sin));
 	if(m_nSocketType==SOCK_DGRAM)
 	{

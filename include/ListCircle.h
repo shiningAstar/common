@@ -37,15 +37,17 @@ class ListCircle
 class ListCircle
 {
     public:
-        ListCircle()
+        ListCircle(int capacity): data_node(NULL)
         {
             head.add(&tail);
-            for(int i = 0; i < 256; i++)
+            this->capacity = capacity;
+            data_node = new type[capacity];
+            for(int i = 0; i < capacity; i++)
             {
                 add_free(&data_node[i]->member);
             }
         }
-        virtual ~ListCircle(){}
+        virtual ~ListCircle(){if(data_node != NULL) delete []data_node;}
 
         ListHead *getHead(){return &head;}
         ListHead *getTail(){return &tail;}
@@ -65,7 +67,8 @@ class ListCircle
 
     private:
         ListHead head, tail;
-        type data_node[256];
+        int capacity;
+        type *data_node;
 }
 
 #endif // LISTCIRCLE_H_INCLUDED

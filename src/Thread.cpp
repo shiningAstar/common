@@ -82,14 +82,18 @@ THREAD_STATUS Thread::getStatus()
 
 namespace CurrentThread
 {
-    __thread pid_t thread_id = 0;
+    #ifndef _WIN32
+    __thread
+    #endif // _WIN32
+     pid_t thread_id = 0;
     pid_t tid()
     {
-        if(thread_id != 0)
-        {
-            return thread_id;
-        }
+
         #ifndef _WIN32
+            if(thread_id != 0)
+            {
+                return thread_id;
+            }
             thread_id = static_cast<pid_t>(::syscall(SYS_gettid));
         #else
             thread_id = (pid_t)GetCurrentThreadId();

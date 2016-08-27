@@ -1,4 +1,4 @@
-﻿#ifndef COMMON_SOCKET_H
+#ifndef COMMON_SOCKET_H
 #define COMMON_SOCKET_H
 
 #include <stdio.h>
@@ -192,7 +192,7 @@ public:
 	int Connect(char* destAddr,char* destPort);
 	int Connect(char* destAddr,int destPort);
 	int Connect(int destAddr,char* destPort);
-	int Connect(int destAddr,int destPort);
+	int Connect(unsigned int destAddr,unsigned int destPort);
 	int Connect(char* destAddr,int destPort,long MSec);
 	int Listen(int BackLog);
 	//不支持本地socket， 下面的两个支持
