@@ -189,6 +189,19 @@ void MySocket::CloseMulticast()
     }
 }
 
+int MySocket::Shutdown(ShutdownCode code = ShutdownCode.Shutdown_both)
+{
+    if(shutdown(m_socket, code) < 0)
+    {
+        return FAIL;
+    }
+
+    Close();
+
+    return OK;
+}
+
+
 int MySocket::Create(int nSocketType)
 {
 	return Create(AF_INET, nSocketType);

@@ -131,13 +131,20 @@ class LIB_EXPORT MySocket
 {
 public:
 // SockRetΪsocket
-    typedef enum{
+    typedef enum
+    {
 	    SockSuccess=0,     //
 	    SockClose = 0,     // socket(recv,recvfrom)
 		SockTimeOut = 0,   // select
 		SockInvalid=INVALID_SOCKET,  //Чsocket
 		SockError=SOCKET_ERROR  //socket
 	} SockRetCode;
+	typedef enum
+	{
+        Shutdown_in = 0,
+        Shutdown_out,
+        Shutdown_both
+	}ShutdownCode;
 protected:
 	SOCKET		m_socket;
 	int         m_domain;
@@ -219,6 +226,7 @@ public:
 	int ReadLine(char* pData,int MaxLen,int MSec);
 	void Close();
 	void CloseMulticast();
+	void Shutdown(ShutdownCode code = Shutdown_both);
 
     int GetLastSocketError();
     int ObtainLocalAddr();

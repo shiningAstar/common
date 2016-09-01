@@ -3,7 +3,7 @@
 
 #include "List.h"
 #include "SemaphorePV.h"
-//#include "errno.h"
+#include "errno.h"
 
 //队列基类
 class Que
@@ -332,10 +332,6 @@ class SequentListQue : Que
         type *getTail()
         {
             int i;
-            if(!Que::getTail(data, length))
-            {
-                return NULL;
-            }
             if(capacity < 2 || sequentTable == NULL)
             {
                 return NULL;
@@ -393,10 +389,6 @@ class SequentListQue : Que
         }
         type *getHead()
         {
-            if(!Que::getHead(data, length))
-            {
-                return NULL;
-            }
             if(capacity < 2 || sequentTable == NULL)
             {
                 return NULL;
