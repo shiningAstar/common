@@ -445,6 +445,33 @@ class SequentListQue : Que
             memcpy(data, (char *)&sequentTable[i], len);
             return true;
         }
+        type *getQueItem(int index)
+        {
+            unsigned int len = sizeof(type);
+            int i;
+            if(!Que::getQueItem(index, data, length))
+            {
+                return NULL;
+            }
+            if(capacity < 2 || sequentTable == NULL)
+            {
+                return NULL;
+            }
+            if(head < 0 || head >= capacity || tail < 0 || tail >= capacity)
+            {
+                return NULL;
+            }
+            if(length < len)
+            {
+                return NULL;
+            }
+            if(index >= numOfQueItem())
+            {
+                return NULL;
+            }
+            i = (head + index) % capacity;
+            return &sequentTable[i];
+        }
         bool isEmpty()
         {
             //empty while tail == head
@@ -463,7 +490,7 @@ class SequentListQue : Que
             }
             return true;
         }
-        bool clear() {tail = head;}
+        bool clear() {head = tail;}
     protected:
         int capacity;
         type *sequentTable;

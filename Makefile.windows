@@ -10,7 +10,7 @@ vpath %.cpp src\
 none_objects = main.o File.o logBase.o logTerminal.o logFile.o ControlwithLog.o \
 					logControl.o log.o MySocket.o MutexLock.o ConfigBase.o FileConfig.o \
 					SemaphorePV.o Thread.o SharedMemory.o Crc.o  BlockingInterruptor.o FuncPtrMap.o \
-
+					Error.o
 
 objects_release = $(foreach file, $(none_objects), $(patsubst %.o, %_release.o, $(file)))
 objects_debug = $(foreach file, $(none_objects), $(patsubst %.o, %_debug.o, $(file)))
@@ -20,12 +20,12 @@ obj_files_debug = $(foreach file, $(objects_debug),$(dir_obj_debug)\$(file))
 
 h_export = logBase.h logFile.h logTerminal.h File.h ControlwithLog.h logControl.h log.h MySocket.h MutexLock.h \
 			ConfigBase.h FileConfig.h SemaphorePV.h Thread.h Error.h SharedMemory.h base.h Crc.h BlockingInterruptor.h \
-			FuncPtrMap.h NorMap.h List.h Que.h
+			FuncPtrMap.h NorMap.h List.h Que.h Error.h FuncPtrMap.h ListCircle.h Thread.h
 
 h_export_file = $(foreach file, $(h_export), include\$(file))
 
-compile_obj_release = mingw32-g++ -Wall -O2 -Iinclude -c
-compile_obj_debug = mingw32-g++ -Wall -g -Iinclude -c
+compile_obj_release = mingw32-g++ -Wall -O2 -DHAVE_STRUCT_TIMESPEC -Iinclude -c
+compile_obj_debug = mingw32-g++ -Wall -g -DHAVE_STRUCT_TIMESPEC -Iinclude -c
 
 target_lib_name_release = $(dir_bin_release)\libcommon.dll
 target_lib_impname_release = $(dir_bin_release)\libcommon.a
