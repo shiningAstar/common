@@ -226,7 +226,7 @@ public:
 	int ReadLine(char* pData,int MaxLen,int MSec);
 	void Close();
 	void CloseMulticast();
-	void Shutdown(ShutdownCode code = Shutdown_both);
+	int Shutdown(ShutdownCode code = Shutdown_both);
 
     int GetLastSocketError();
     int ObtainLocalAddr();

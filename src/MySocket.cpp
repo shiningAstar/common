@@ -189,7 +189,7 @@ void MySocket::CloseMulticast()
     }
 }
 
-int MySocket::Shutdown(ShutdownCode code = ShutdownCode.Shutdown_both)
+int MySocket::Shutdown(ShutdownCode code)
 {
     if(shutdown(m_socket, code) < 0)
     {
@@ -593,7 +593,7 @@ int MySocket::Connect(unsigned int destAddr, unsigned int destPort)
     }
 #ifndef _WIN32
 
-    if(m_domain != AF_LOCAL && m_domain != AF_UNIX)
+    /*if(m_domain != AF_LOCAL && m_domain != AF_UNIX)
     {
         goto normal;
     }
@@ -607,7 +607,7 @@ int MySocket::Connect(unsigned int destAddr, unsigned int destPort)
 	{
 		Close();
 	}
-	return OK;
+	return OK;*/
 
 #endif // _WIN32
 //网络socket
@@ -639,7 +639,7 @@ normal:
 	{
 		int share=1;
 		sin.sin_family=AF_INET;
-		sin.sin_port=0 ;
+		sin.sin_port=0;
 		sin.sin_addr.s_addr=INADDR_ANY ;
 		SetSockOpt((int)SOL_SOCKET,SO_REUSEADDR,(char*)&share,sizeof(share));
 		if(bind(m_socket,(struct sockaddr*)&sin,sizeof(sin))==SockError)
@@ -656,7 +656,7 @@ normal:
     //{
         //printf("%02x ", ((unsigned char *)&m_sockDest)[i]);
     //}
-	if(connect(m_socket, (struct sockaddr*)&m_sockDest, sizeof(m_sockDest))==SockError)
+	if(connect(m_socket, (struct sockaddr*)&sin, sizeof(sin))==SockError)
 	{
 		Close();
 		return FAIL;

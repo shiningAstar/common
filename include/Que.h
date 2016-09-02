@@ -344,7 +344,7 @@ class SequentListQue : Que
             {
                 return NULL;
             }
-            i = (tail + capacity - 1) % capacity;
+            i = (tail + capacity) % capacity;
             return &sequentTable[i];
         }
         bool pushed()
@@ -449,19 +449,12 @@ class SequentListQue : Que
         {
             unsigned int len = sizeof(type);
             int i;
-            if(!Que::getQueItem(index, data, length))
-            {
-                return NULL;
-            }
+
             if(capacity < 2 || sequentTable == NULL)
             {
                 return NULL;
             }
             if(head < 0 || head >= capacity || tail < 0 || tail >= capacity)
-            {
-                return NULL;
-            }
-            if(length < len)
             {
                 return NULL;
             }
@@ -490,7 +483,7 @@ class SequentListQue : Que
             }
             return true;
         }
-        bool clear() {head = tail;}
+        bool clear() {head = tail;return true;}
     protected:
         int capacity;
         type *sequentTable;
