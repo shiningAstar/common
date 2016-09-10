@@ -46,19 +46,12 @@ SharedMemory::~SharedMemory()
 
 	munmap(mem_ptr, size);
 
-    if (shm_unlink(name) < 0)
-    {
-        printf("shm_unlink %s\n",name);
-        //printf("shm_unlink ");
-    }
-
 #endif
 }
 
 SharedMemory::SharedMemory(char *name, size_t size) : size(size), mem_ptr(NULL)
 {
     valueInit();
-    init(name, size);
 }
 
 void SharedMemory::valueInit()
@@ -81,6 +74,7 @@ unsigned long SharedMemory::getSize()
 
 bool SharedMemory::init(char *name, size_t size)
 {
+    char name_share[256];
     if(name == NULL || size < 0)
     {
         return false;
@@ -108,8 +102,9 @@ bool SharedMemory::init(char *name, size_t size)
 		strncpy(this->name,"Global\\",64);
 
 #endif
-	strncat(this->name, prefix,64);
-	strncat(this->name, name,64);
+    strncpy(this->name, name, 128);
+	strncat(name_share, prefix, 64);
+	strncat(name_share, name,64);
 
 	//strncpy(p_shm->name,shm_name,64 );
 	//this->size = size;
@@ -166,38 +161,43 @@ bool SharedMemory::init(char *name, size_t size)
 
     int fd;
     struct stat shm_stat;
-    fd = shm_open(this->name, O_RDWR | O_CREAT | O_EXCL, 666);
-    if( fd < 0 && errno == EEXIST)
+    fd = shm_open(name_share, O_RDWR | O_CREAT | O_EXCL, 666);
+    if(fd < 0)
     {
-    	//printf("mm_init shm_open EEXIST\n");
+        if(errno != EEXIST)
+        {
+            printf("share memory shm_open %s failed. errno=%d \n", name_share, errno);
+            return false;
+        }
+        printf("share memory shm_open EEXIST\n");
     	create = false;
-        fd = shm_open(this->name, O_RDWR | O_EXCL, 666);
+        fd = shm_open(name_share, O_RDWR, 666);
         if (fd < 0)
         {
-            printf("mm_init shm_open(%s) failed. errno=%d \n", this->name, errno);
+            printf("share memory shm_open %s failed. errno=%d \n", name_share, errno);
             return false;
         }
         if(fstat(fd,&shm_stat) < 0)
         {
-            printf("mm_open stat(%s) failed. errno=%d\n", this->name, errno);
+            printf("share memory stat %s failed. errno=%d\n", name_share, errno);
             close(fd);
             return false;
         }
-        goto filemap;
+        this->size = shm_stat.st_size;
     }
 
-    if (fd < 0)
-    {
-        printf("mm_init shm_open(%s) failed. errno=%d \n", this->name, errno);
-        return false;
-    }
+
 
     //创建设置大小
-	if (ftruncate(fd, size) < 0)
+	if (create && ftruncate(fd, size) < 0)
 	{
-		printf("mm_init ftruncate(%s) failed. errno=%d\n", this->name, errno);
+		printf("share memory ftruncate %s failed. errno=%d\n", name_share, errno);
 		close(fd);
 		return false;
+    }
+    if(create)
+    {
+        this->size = size;
     }
 filemap:
     /* map memory to process */
@@ -207,13 +207,22 @@ filemap:
 
     if(mem_ptr == MAP_FAILED)
     {
-        close(fd);
+        printf("share memory mmap %s failed. errno=%d\n", name_share, errno);
+        this->size = 0;
         return false;
     }
 
-    this->size = size;
-
 #endif
     //printf("shm_init:  %x---%x\n",p_shm,p_shm->shm);
+    return true;
+}
+
+bool SharedMemory::finish()
+{
+    if (shm_unlink(name) < 0)
+    {
+        printf("share memory shm_unlink.\n");
+        return false;
+    }
     return true;
 }

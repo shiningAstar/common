@@ -18,6 +18,7 @@ class SharedMemory
         virtual ~SharedMemory();
 
         bool init(char *name, size_t size);
+        bool finish();
 
         void *getAddr();
         unsigned long getSize();
