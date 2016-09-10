@@ -94,7 +94,8 @@ bool log::output_log_with_level(int level, char *log_txt, ...)
 {
     bool ret = true;
     va_list arg_list;
-    if(level < log_level || level < 0 || level > 3)
+    //if(level < log_level || level < 0 || level > 3)
+    if(level < 0 || level > 3)
     {
         return false;
     }
@@ -105,6 +106,8 @@ bool log::output_log_with_level(int level, char *log_txt, ...)
     va_start(arg_list, log_txt);
     for(int i = 0; i < num_of_log; i++)
     {
+        if(level < log_func_list[i]->level)
+            continue;
         if(log_func_list[i]->log(level_str[level]) < 0)
         {
             ret = false;
@@ -121,7 +124,8 @@ bool log::output_log_with_level(int level, char *log_txt, ...)
 bool log::voutput_log_with_level(int level, char *log_txt, va_list va)
 {
     bool ret = true;
-    if(level < log_level || level < 0 || level > 3)
+    //if(level < log_level || level < 0 || level > 3)
+    if(level < 0 || level > 3)
     {
         return false;
     }
@@ -131,6 +135,8 @@ bool log::voutput_log_with_level(int level, char *log_txt, va_list va)
     }
     for(int i = 0; i < num_of_log; i++)
     {
+        if(level < log_func_list[i]->level)
+            continue;
         if(log_func_list[i]->log(level_str[level]) < 0)
         {
             ret = false;
@@ -147,7 +153,8 @@ bool log::output_log_with_level_line(int level, char *log_txt, ...)
 {
     bool ret = true;
     va_list arg_list;
-    if(level < log_level || level < 0 || level > 3)
+    //if(level < log_level || level < 0 || level > 3)
+    if(level < 0 || level > 3)
     {
         return false;
     }
@@ -158,6 +165,8 @@ bool log::output_log_with_level_line(int level, char *log_txt, ...)
     va_start(arg_list, log_txt);
     for(int i = 0; i < num_of_log; i++)
     {
+        if(level < log_func_list[i]->level)
+            continue;
         if(log_func_list[i]->log(level_str[level]) < 0)
         {
             ret = false;
@@ -178,7 +187,8 @@ bool log::output_log_with_level_line(int level, char *log_txt, ...)
 bool log::voutput_log_with_level_line(int level, char *log_txt, va_list va)
 {
     bool ret = true;
-    if(level < log_level || level < 0 || level > 3)
+    //if(level < log_level || level < 0 || level > 3)
+    if(level < 0 || level > 3)
     {
         return false;
     }
@@ -188,6 +198,8 @@ bool log::voutput_log_with_level_line(int level, char *log_txt, va_list va)
     }
     for(int i = 0; i < num_of_log; i++)
     {
+        if(level < log_func_list[i]->level)
+            continue;
         if(log_func_list[i]->log(level_str[level]) < 0)
         {
             ret = false;
@@ -209,7 +221,8 @@ bool log::output_log_with_level_time_line(int level, char *log_txt, ...)
     bool ret = true;
     va_list arg_list;
     char * time_char;
-    if(level < log_level || level < 0 || level > 3)
+    //if(level < log_level || level < 0 || level > 3)
+    if(level < 0 || level > 3)
     {
         return false;
     }
@@ -224,6 +237,8 @@ bool log::output_log_with_level_time_line(int level, char *log_txt, ...)
     va_start(arg_list, log_txt);
     for(int i = 0; i < num_of_log; i++)
     {
+        if(level < log_func_list[i]->level)
+            continue;
         if(log_func_list[i]->log(level_str[level]) < 0)
         {
             ret = false;
@@ -245,7 +260,8 @@ bool log::voutput_log_with_level_time_line(int level, char *log_txt, va_list va)
 {
     bool ret = true;
     char * time_char;
-    if(level < log_level || level < 0 || level > 3)
+    //if(level < log_level || level < 0 || level > 3)
+    if(level < 0 || level > 3)
     {
         return false;
     }
@@ -259,6 +275,8 @@ bool log::voutput_log_with_level_time_line(int level, char *log_txt, va_list va)
     }
     for(int i = 0; i < num_of_log; i++)
     {
+        if(level < log_func_list[i]->level)
+            continue;
         if(log_func_list[i]->log(level_str[level]) < 0)
         {
             ret = false;

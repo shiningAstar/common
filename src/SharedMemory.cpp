@@ -211,6 +211,8 @@ filemap:
         return false;
     }
 
+    this->size = size;
+
 #endif
     //printf("shm_init:  %x---%x\n",p_shm,p_shm->shm);
     return true;

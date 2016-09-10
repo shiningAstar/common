@@ -1443,9 +1443,9 @@ SOCKET* MySocket::GetSocketPtr()
 	return &m_socket;
 }
 
-int MySocket::SetNonBlockMode(DWORD bBlock)
+int MySocket::SetNonBlockMode(DWORD NonBlock)
 {
-	if(ioctl(m_socket,FIONBIO,&bBlock)==0) return OK;
+	if(ioctl(m_socket,FIONBIO,&NonBlock)==0) return OK;
 	else return FAIL;
 }
 

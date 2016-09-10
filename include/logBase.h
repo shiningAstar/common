@@ -14,6 +14,9 @@ class logBase
         virtual int log(char *log_txt, ...) = 0;
         virtual int vlog(char *log_txt, va_list va) = 0;
         virtual int flush() = 0;
+
+        int level;
+        char status;
     protected:
     private:
 };
