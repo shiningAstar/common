@@ -1,5 +1,5 @@
-#ifndef LOG_H
-#define LOG_H
+#ifndef LOG_HH
+#define LOG_HH
 
 #include "logBase.h"
 #include "logTerminal.h"
