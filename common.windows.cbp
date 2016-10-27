@@ -56,6 +56,9 @@
 		<Unit filename="include/Que.h" />
 		<Unit filename="include/SemaphorePV.h" />
 		<Unit filename="include/SharedMemory.h" />
+		<Unit filename="include/Stack.h">
+			<Option target="&lt;{~None~}&gt;" />
+		</Unit>
 		<Unit filename="include/Thread.h" />
 		<Unit filename="include/base.h" />
 		<Unit filename="include/log.h" />

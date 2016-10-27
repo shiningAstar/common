@@ -23,11 +23,13 @@ class BlockingInterruptor
         bool available();
         bool interrupt();
         bool restore();
+        bool writen(const char *buf, unsigned int length);
+        bool readn(char *buf, unsigned int length);
     protected:
 
         #ifdef _WIN32
 		MySocket server;
-        MySocket sock_in;        
+        MySocket sock_in;
         MySocket sock_out;
         #else
         int fdctr[2];

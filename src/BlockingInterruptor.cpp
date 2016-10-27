@@ -178,3 +178,51 @@ bool BlockingInterruptor::restore()
     return true;
 }
 
+bool BlockingInterruptor::writen(const char *buf, unsigned int length)
+{
+    int len;
+    if(buf == NULL || length == 0)
+        return false;
+    if(!avail)
+        return false;
+    while(length > 0)
+    {
+        len = write(fdctr[1], buf, length);
+        if(len < 0)
+        {
+            if(errno == EINTR || errno == EWOULDBLOCK || errno == EAGAIN)
+                continue;
+            return false;
+        }
+        if(len == 0)
+            return false;
+        length -= len;
+        buf += len;
+    }
+    return true;
+}
+
+bool BlockingInterruptor::readn(char *buf, unsigned int length)
+{
+    int len;
+    if(buf == NULL || length == 0)
+        return false;
+    if(!avail)
+        return false;
+    while(length > 0)
+    {
+        len = read(fdctr[0], buf, length);
+        if(len < 0)
+        {
+            if(errno == EINTR || errno == EWOULDBLOCK || errno == EAGAIN)
+                continue;
+            return false;
+        }
+        if(len == 0)
+            return false;
+        length -= len;
+        buf += len;
+    }
+    return true;
+}
+
